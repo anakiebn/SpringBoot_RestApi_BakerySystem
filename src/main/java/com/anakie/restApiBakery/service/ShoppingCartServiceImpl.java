@@ -106,7 +106,6 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     @Override
     public ShoppingCart save(ShoppingCart shoppingCart) throws Exception {
 
-
         for (CartItem cartItem : shoppingCart.getCartItems()) {
             Product product = productService.findById(cartItem.getProductId());
             int productQty = cartItem.getProductQty();
@@ -121,7 +120,6 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
             cartItem.setShoppingCart(shoppingCart);
             cartItemRepository.save(cartItem);
         }
-
         return shoppingCart;
     }
 
@@ -136,7 +134,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         if (shoppingCartRepository.findById(id).isEmpty()) {
             throw new ShoppingCartNotFound("Shopping cart of id: " + id + " not found, can't delete");
         }
-        shoppingCartRepository.deleteShoppingCartById(id);
+        shoppingCartRepository.deleteById(id);
     }
 
     @Override

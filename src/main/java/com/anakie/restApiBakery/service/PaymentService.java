@@ -6,12 +6,12 @@ import com.anakie.restApiBakery.exception.PaymentNotFoundException;
 import java.util.List;
 
 public interface PaymentService {
-    Payment addPayment(Payment payments);
-    Payment getPaymentById(Long id) throws PaymentNotFoundException;
+    Payment save(Payment payments);
+    Payment findById(Long id) throws PaymentNotFoundException;
 
-    int deletePaymentById(Long id) throws PaymentNotFoundException;
+    void deleteById(Long id) throws PaymentNotFoundException;
 
-    Payment updatePayment(Payment payments) throws PaymentNotFoundException;
+    Payment update(Payment payments) throws PaymentNotFoundException;
 
-    List<Payment> getAllPayments();
+    List<Payment> findAll();
 }

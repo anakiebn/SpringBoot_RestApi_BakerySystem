@@ -31,7 +31,7 @@ public class Product {
 
     private String image;
 
-    @Column(scale=2,nullable = false)
+    @Column(scale=3,nullable = false)
     private double price;
 
     @Column(length = 200)

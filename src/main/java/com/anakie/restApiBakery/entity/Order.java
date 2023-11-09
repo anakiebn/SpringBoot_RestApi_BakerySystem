@@ -28,6 +28,9 @@ public class Order {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @Enumerated(EnumType.STRING)
+    private Status status;
+
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "shopping_cart_id")
     private ShoppingCart shoppingCart;

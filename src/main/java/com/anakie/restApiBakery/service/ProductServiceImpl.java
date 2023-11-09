@@ -17,7 +17,6 @@ import java.util.List;
 
 @Service
 public class ProductServiceImpl implements ProductService{
-
     @Autowired
     private ProductRepository productRepository;
     @Autowired
@@ -31,8 +30,6 @@ public class ProductServiceImpl implements ProductService{
         Long recipeId=productDTO.getRecipeId();
         Long categoryId=productDTO.getCategoryId();
 
-
-
         if(!recipeService.existsById(recipeId)){
             throw new RecipeNotFoundException("Recipe id: "+recipeId+" is invalid, use existing recipe or create one");
         }
@@ -42,10 +39,7 @@ public class ProductServiceImpl implements ProductService{
         if(productDTO.getName()==null){
             throw new PropertyValueException("Product name can't be null","Product","name");
         }
-
-
         Product product=productDTO.toProduct(categoryService,recipeService);
-
         return productRepository.save(product);
     }
     @Override
@@ -59,9 +53,8 @@ public class ProductServiceImpl implements ProductService{
         if(!productRepository.existsById(id)){
             throw new ProductNotFoundException("Can't delete product "+id+" not found, use an existing id!");
         }
-        productRepository.deleteProductById(id);
+        productRepository.deleteById(id);
     }
-
 
     @Override
     public Product update(ProductDTO productDTO) throws ProductNotFoundException, CategoryNotFoundException, RecipeNotFoundException {
@@ -70,12 +63,10 @@ public class ProductServiceImpl implements ProductService{
         }
         return productRepository.save(productDTO.toProduct(categoryService,recipeService));
     }
-
     @Override
     public boolean existsById(Long id) {
         return productRepository.existsById(id);
     }
-
     @Override
     public List<Product> findAll() {
         return productRepository.findAll();
