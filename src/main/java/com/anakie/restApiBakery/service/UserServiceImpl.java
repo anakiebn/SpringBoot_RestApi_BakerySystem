@@ -35,13 +35,13 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public User getUserById(Long id) throws UserNotFoundException {
+    public User findById(Long id) throws UserNotFoundException {
         return userRepository.findById(id).orElseThrow(()->new UserNotFoundException("User "+id+" is not found"));
     }
 
 
     @Override
-    public void deleteUserById(Long id)throws UserNotFoundException {
+    public void deleteById(Long id)throws UserNotFoundException {
         userRepository.delete(userRepository.findById(id).orElseThrow(()-> new UserNotFoundException("Failed to delete, user "+id+" not found!")));
     }
 
@@ -53,7 +53,7 @@ public class UserServiceImpl implements UserService{
         return userRepository.save(user);
     }
     @Override
-    public List<User> getAll() {
+    public List<User> findAll() {
         return userRepository.findAll();
     }
 

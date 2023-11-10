@@ -22,21 +22,18 @@ public class UserController {
     private UserService userService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUser(@PathVariable("id") Long id) {
+    public ResponseEntity<User> findById(@PathVariable("id") Long id) {
         try {
-            return new ResponseEntity<>(userService.getUserById(id), HttpStatus.OK);
-
+            return new ResponseEntity<>(userService.findById(id), HttpStatus.OK);
         } catch (UserNotFoundException ex) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }catch (Exception ex){
             log.error("Exception occurred: " + ex.getMessage());
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
     @GetMapping
-    public ResponseEntity<List<User>> getAll() {
-        return new ResponseEntity<>(userService.getAll(), HttpStatus.OK);
+    public ResponseEntity<List<User>> findAll() {
+        return new ResponseEntity<>(userService.findAll(), HttpStatus.OK);
     }
 
     @PostMapping
@@ -55,11 +52,9 @@ public class UserController {
         try {
 
             return new ResponseEntity<>(userService.saveAddress(address, id), HttpStatus.CREATED);
-        } catch (UserNotFoundException ex) {
+        } catch (Exception ex) {
             log.error("Exception occurred: " + ex.getMessage());
             return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
         }
     }
 
@@ -67,7 +62,7 @@ public class UserController {
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteById(@PathVariable Long id) {
         try {
-            userService.deleteUserById(id);
+            userService.deleteById(id);
             return new ResponseEntity<>("User "+id+" successfully deleted", HttpStatus.GONE);
         } catch (UserNotFoundException ex) {
             log.error("Exception occurred: " + ex.getMessage());

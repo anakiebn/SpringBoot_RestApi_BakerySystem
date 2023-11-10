@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -25,7 +26,7 @@ public class Order {
     private User user;
 
     @OneToMany(mappedBy = "order")
-    private List<OrderStatusHistory> orderStatusHistory;
+    private List<OrderStatusHistory> orderStatusHistories=new ArrayList<>();
 
     private double totalPrice;
 

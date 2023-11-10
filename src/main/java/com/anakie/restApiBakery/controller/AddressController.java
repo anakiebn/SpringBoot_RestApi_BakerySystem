@@ -17,7 +17,7 @@ public class AddressController {
     private AddressService addressService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<Address> getAddress(@PathVariable Long id) {
+    public ResponseEntity<Address> findById(@PathVariable Long id) {
         try {
             log.info("Getting address by ID: {}", id);
             return new ResponseEntity<>(addressService.findById(id), HttpStatus.OK);
@@ -28,14 +28,14 @@ public class AddressController {
     }
 
     @PostMapping
-    public ResponseEntity<Address> addAddress(@RequestBody Address address) {
+    public ResponseEntity<Address> save(@RequestBody Address address) {
         log.info("Adding address");
         Address addedAddress = addressService.save(address);
         return new ResponseEntity<>(addedAddress, HttpStatus.CREATED);
     }
 
     @PutMapping
-    public ResponseEntity<Address> updateAddress(@RequestBody Address address) {
+    public ResponseEntity<Address> update(@RequestBody Address address) {
         try {
             return new ResponseEntity<>(addressService.update(address), HttpStatus.ACCEPTED);
         } catch (AddressNotFoundException ex) {

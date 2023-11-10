@@ -35,19 +35,10 @@ public class ShoppingCartController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ShoppingCart>> getShoppingCart(){
+    public ResponseEntity<List<ShoppingCart>> findAll(){
         return new ResponseEntity<>(shoppingCartService.findAll(), HttpStatus.OK);
     }
 
-//    @PostMapping("/{productId}/{cartId}")
-//    public ResponseEntity<ShoppingCartDTO> addProduct(@PathVariable Long productId,@PathVariable Long cartId){
-//        try {
-//            ShoppingCartDTO shoppingCartDTO=shoppingCartService.addProduct(productId,cartId).toDTO();
-//            return new ResponseEntity<>(shoppingCartDTO, HttpStatus.OK);
-//        } catch (OutOfStockException | ShoppingCartNotFound | ProductNotFoundException e) {
-//            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-//        }
-//    }
 
 
 }

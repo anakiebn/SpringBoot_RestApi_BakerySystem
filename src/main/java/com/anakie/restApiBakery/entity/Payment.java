@@ -23,7 +23,7 @@ public class Payment {
     private Order order;
 
     @OneToMany(mappedBy = "payment")
-    private List<PaymentStatusHistory> paymentStatusHistory=new ArrayList<>();
+    private List<PaymentStatusHistory> paymentStatusHistories=new ArrayList<>();
 
     @Column(scale = 3)
     private double amount;

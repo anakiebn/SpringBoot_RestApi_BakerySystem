@@ -23,7 +23,7 @@ public class ProductController {
     @Autowired
     private ProductService productService;
     @GetMapping("/{id}")
-    public ResponseEntity<Product> getProductById(@PathVariable Long id){
+    public ResponseEntity<Product> findById(@PathVariable Long id){
         try {
             return new ResponseEntity<>(productService.findById(id), HttpStatus.OK);
         }catch (ProductNotFoundException ex){
@@ -32,11 +32,11 @@ public class ProductController {
         }
     }
     @GetMapping
-    public ResponseEntity<List<Product>> getAllProduct(){
+    public ResponseEntity<List<Product>> findAll(){
             return new ResponseEntity<>(productService.findAll(), HttpStatus.OK);
     }
     @PostMapping
-    public ResponseEntity<Product> addProduct(@RequestBody ProductDTO productDTO){
+    public ResponseEntity<Product> save(@RequestBody ProductDTO productDTO){
         try {
             return new ResponseEntity<>(productService.save(productDTO), HttpStatus.OK);
         }catch(RecipeNotFoundException | CategoryNotFoundException | PropertyValueException ex){
@@ -45,7 +45,7 @@ public class ProductController {
         }
     }
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteProduct(@PathVariable Long id){
+    public ResponseEntity<String> deleteById(@PathVariable Long id){
         try {
             productService.deleteById(id);
             return new ResponseEntity<>("Product id: "+id+" Successfully removed", HttpStatus.GONE);

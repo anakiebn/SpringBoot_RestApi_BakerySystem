@@ -35,20 +35,8 @@ public class RecipeController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-//    @GetMapping("/recipeIngredients/{id}")
-//    public ResponseEntity<List<Ingredient>> getRecipeIngredients(@PathVariable Long id){
-//        try {
-//            return new ResponseEntity<>(recipeService.getRecipeIngredients(id), HttpStatus.OK);
-//        }catch (RecipeNotFoundException ex){
-//            log.error("Exception occurred: "+ex.getMessage());
-//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-//        }catch (Exception ex){
-//            log.error("Exception occurred: "+ex.getMessage());
-//            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-//        }
-//    }
     @GetMapping
-    public ResponseEntity<List<Recipe>> getAllRecipe(){
+    public ResponseEntity<List<Recipe>> findAll(){
         try {
             return new ResponseEntity<>(recipeService.getAllRecipes(), HttpStatus.OK);
         }catch (Exception ex){
@@ -57,7 +45,7 @@ public class RecipeController {
         }
     }
     @PostMapping
-    public ResponseEntity<Recipe> addRecipe(@RequestBody Recipe recipe){
+    public ResponseEntity<Recipe> save(@RequestBody Recipe recipe){
         try {
             return new ResponseEntity<>(recipeService.addRecipe(recipe), HttpStatus.OK);
         }catch(MissingIngredientException | SQLIntegrityConstraintViolationException | IngredientNotFoundException ex){
@@ -65,22 +53,8 @@ public class RecipeController {
             return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
         }
     }
-//    @PostMapping("/id")
-//    public ResponseEntity<Recipe> addRecipeIngredients(@RequestBody List<Ingredient> ingredients,Long recipeId){
-//        try {
-//            return new ResponseEntity<>(recipeService.addRecipeIngredients(ingredients,recipeId), HttpStatus.OK);
-//      }//catch(MissingIngredientException ex){
-////            log.error("Exception occurred: "+ex.getMessage());
-////            return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
-////        }
-//        catch (Exception ex){
-//            log.error("Exception occurred: "+ex.getMessage());
-//            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-//        }
-//    }
-
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteRecipe(@PathVariable Long id){
+    public ResponseEntity<String> deleteById(@PathVariable Long id){
         try {
             recipeService.deleteRecipeById(id);
             return new ResponseEntity<>("Recipe id: "+id+" successfully removed", HttpStatus.GONE);

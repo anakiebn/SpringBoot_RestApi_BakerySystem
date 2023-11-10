@@ -11,13 +11,13 @@ import java.util.List;
 public interface UserService {
 
     User save(User user) throws DuplicateEmailException;
-    User getUserById(Long id) throws UserNotFoundException;
+    User findById(Long id) throws UserNotFoundException;
 
-    void deleteUserById(Long id) throws UserNotFoundException;
+    void deleteById(Long id) throws UserNotFoundException;
 
     User update(User user) throws UserNotFoundException;
-    List<User> getAll();
-    User saveAddress(Address address, Long id) throws UserNotFoundException, Exception;
+    List<User> findAll();
+    User saveAddress(Address address, Long userId) throws UserNotFoundException, Exception;
 
     boolean existsById(Long id);
 }

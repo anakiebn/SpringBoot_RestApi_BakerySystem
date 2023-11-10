@@ -1,8 +1,5 @@
 package com.anakie.restApiBakery.entity;
 
-import com.anakie.restApiBakery.exception.CartEmptyException;
-import com.anakie.restApiBakery.exception.ProductNotFoundException;
-import com.anakie.restApiBakery.exception.ShoppingCartNotFound;
 import com.anakie.restApiBakery.exception.UserNotFoundException;
 import com.anakie.restApiBakery.service.UserService;
 import jakarta.persistence.CascadeType;
@@ -29,7 +26,7 @@ public class OrderDTO {
     public Order toOrder(UserService userService) throws UserNotFoundException {
         Order order = new Order();
         //if we don't find the user we throw an exception
-        User user = userService.getUserById(userId);
+        User user = userService.findById(userId);
         order.setUser(user);
         order.setShoppingCart(this.getShoppingCart());
         return order;

@@ -6,6 +6,9 @@ import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Setter
 @Getter
@@ -22,5 +25,8 @@ public class Account {
 
     @Column(scale = 3)
     private double amount;
+
+    @OneToMany(mappedBy = "account")
+    private List<AccountStatusHistory> accountStatusHistories=new ArrayList<>();
 
 }

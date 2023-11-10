@@ -12,7 +12,6 @@ public class AccountServiceImpl implements AccountService{
     @Autowired
     private AccountRepository accountRepository;
 
-
     @Override
     public Account save(Account account) {
         return accountRepository.save(account);
@@ -35,6 +34,32 @@ public class AccountServiceImpl implements AccountService{
 
     @Override
     public Account update(Account account) throws AccountNotFoundException {
+
+       if(!accountRepository.existsById(account.getId())){
+           throw new AccountNotFoundException("Account not found, use existing account!");
+        }
+
+
         return null;
+    }
+
+    @Override
+    public double fundAccount(Long accountId, double amount) throws AccountNotFoundException {
+        Account account=accountRepository.findById(accountId).orElseThrow(
+                ()->new AccountNotFoundException("Account not found, use existing account!"));
+        if(amount>0){
+            account.setAmount(amount);
+        }
+        return 0;
+    }
+
+    @Override
+    public double useFunds(Long accountId, double amount) throws AccountNotFoundException {
+        Account account=accountRepository.findById(accountId).orElseThrow(
+                ()->new AccountNotFoundException("Account not found, use existing account!"));
+        if(amount>account.getAmount()){
+
+        }
+        return 0;
     }
 }
