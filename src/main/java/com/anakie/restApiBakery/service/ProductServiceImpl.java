@@ -71,5 +71,10 @@ public class ProductServiceImpl implements ProductService{
     public List<Product> findAll() {
         return productRepository.findAll();
     }
+    @Override
+    public double totalAmount(Long productId,int productQty) throws ProductNotFoundException {
+        Product product=productRepository.findById(productId).orElseThrow(()->new ProductNotFoundException("Product not found, refer to existing product"));
+        return product.getPrice()*productQty;
+    }
 
 }

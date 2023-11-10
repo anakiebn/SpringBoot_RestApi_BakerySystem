@@ -25,6 +25,7 @@ public class OrderDTO {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "shopping_cart_id")
     private ShoppingCart shoppingCart;
+
     public Order toOrder(UserService userService) throws UserNotFoundException {
         Order order = new Order();
         //if we don't find the user we throw an exception

@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -24,6 +25,7 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private IngredientService ingredientService;
 
+
     @Override
     public Order save(OrderDTO orderDTO) throws  Exception {
         Order order=orderDTO.toOrder(userService);
@@ -37,6 +39,12 @@ public class OrderServiceImpl implements OrderService {
                 throw new RuntimeException(e);
             }
         });
+         double totalPrice=0;
+        for(CartItem cartItem:order.getShoppingCart().getCartItems()){
+            totalPrice+=productService.totalAmount(cartItem.getProductId(),cartItem.getProductQty());
+        }
+        order.setTotalPrice(totalPrice);
+
         return orderRepository.save(order);
     }
 
@@ -73,6 +81,9 @@ public class OrderServiceImpl implements OrderService {
     public boolean existsById(Long id){
         return orderRepository.existsById(id);
     }
+
+
+
     @Override
     public List<Order> findAll() {
         return orderRepository.findAll();

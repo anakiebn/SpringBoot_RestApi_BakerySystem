@@ -2,28 +2,23 @@ package com.anakie.restApiBakery.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Entity
-@Getter
 @Setter
-@RequiredArgsConstructor
-public class Payment {
+@Getter
+@NoArgsConstructor
+public class Account {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @OneToOne
-    @JoinColumn(name = "order_id")
-    private Order order;
-
-    @OneToMany(mappedBy = "payment")
-    private List<PaymentStatusHistory> paymentStatusHistory=new ArrayList<>();
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @Column(scale = 3)
     private double amount;

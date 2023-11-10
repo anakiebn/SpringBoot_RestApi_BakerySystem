@@ -1,16 +1,12 @@
 package com.anakie.restApiBakery.entity;
 
-import com.anakie.restApiBakery.exception.UserNotFoundException;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import org.hibernate.proxy.HibernateProxy;
-import org.springframework.data.domain.jaxb.SpringDataJaxb;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 
 
 @Entity
@@ -28,8 +24,10 @@ public class Order {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Enumerated(EnumType.STRING)
-    private Status status;
+    @OneToMany(mappedBy = "order")
+    private List<OrderStatusHistory> orderStatusHistory;
+
+    private double totalPrice;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "shopping_cart_id")

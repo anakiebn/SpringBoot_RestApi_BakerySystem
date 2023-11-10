@@ -10,7 +10,10 @@ public enum Status {
     ACTIVE,
     NOT_ACTIVE,
     SETTLED,
-    REFUNDED
-
+    REFUNDED,
+    NOT_PAID,
+    PAID,
+    PAID_GOT_CHANGE,
+    SETTLED_WITH_CHANGE
 
 }

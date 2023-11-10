@@ -18,4 +18,5 @@ public interface ProductService {
     void deleteById(Long id) throws ProductNotFoundException;
     Product update(ProductDTO productDTO) throws ProductNotFoundException, CategoryNotFoundException, RecipeNotFoundException;
     boolean existsById(Long id);
+    public double totalAmount(Long productId,int productQty) throws ProductNotFoundException;
 }
