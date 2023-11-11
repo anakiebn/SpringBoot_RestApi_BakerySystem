@@ -19,6 +19,7 @@ public class OrderStatusHistory {
 
     private LocalDateTime dateTime;
 
+    @Enumerated(EnumType.STRING)
     private Status status;
 
     @JsonIgnore

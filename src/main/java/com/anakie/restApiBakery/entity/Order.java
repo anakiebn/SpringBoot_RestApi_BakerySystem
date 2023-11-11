@@ -35,6 +35,6 @@ public class Order {
     private ShoppingCart shoppingCart;
 
     @Column(name="orderDateTime")
-    private final LocalDateTime dateTime=LocalDateTime.now();
+    private LocalDateTime dateTime=LocalDateTime.now();
 
 }

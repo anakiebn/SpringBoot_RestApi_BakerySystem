@@ -28,7 +28,7 @@ public class Address {
     @Column(length = 50,nullable = false)
     private String city;
 
-    @Column(length = 50,nullable = false)
+    @Column(length = 50)
     private String suburb;
 
     @Column(nullable = false)

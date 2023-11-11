@@ -2,7 +2,7 @@ package com.anakie.restApiBakery.entity;
 
 public enum Status {
 
-    RECEIVED,
+    RECEIVED, FUNDED, WITHDRAW,PAID_WITH_ACCOUNT,
     PROCESSING_ORDER ,
     BAKING, OUT_FOR_DELIVERY,
     DELIVERED,
@@ -14,6 +14,6 @@ public enum Status {
     NOT_PAID,
     PAID,
     PAID_GOT_CHANGE,
-    SETTLED_WITH_CHANGE
+    NEW, SETTLED_WITH_CHANGE
 
 }

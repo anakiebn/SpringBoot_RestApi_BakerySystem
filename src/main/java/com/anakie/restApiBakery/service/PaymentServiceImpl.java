@@ -1,10 +1,9 @@
 package com.anakie.restApiBakery.service;
 
 import com.anakie.restApiBakery.entity.*;
-import com.anakie.restApiBakery.exception.InsufficientFundsException;
-import com.anakie.restApiBakery.exception.OrderNotFoundException;
-import com.anakie.restApiBakery.exception.PaymentNotFoundException;
-import com.anakie.restApiBakery.exception.ProductNotFoundException;
+import com.anakie.restApiBakery.exception.*;
+import com.anakie.restApiBakery.repository.AccountStatusHistoryRepository;
+import com.anakie.restApiBakery.repository.OrderStatusHistoryRepository;
 import com.anakie.restApiBakery.repository.PaymentRepository;
 import com.anakie.restApiBakery.repository.PaymentStatusHistoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,47 +22,36 @@ public class PaymentServiceImpl implements PaymentService {
     @Autowired
     private ProductService productService;
     @Autowired
+    private AccountService accountService;
+    @Autowired
     private PaymentStatusHistoryRepository paymentStatusHistoryRepository;
+    @Autowired
+    private OrderStatusHistoryRepository orderStatusHistoryRepository;
+    @Autowired
+    private AccountStatusHistoryRepository accountStatusHistoryRepository;
 
     @Override
-    public Payment save(PaymentDTO paymentDTO) throws OrderNotFoundException, ProductNotFoundException, InsufficientFundsException {
-        // ensure that we have valid order
-        Payment payment=paymentDTO.toPayment(orderService);
+    public Payment save(PaymentDTO paymentDTO) throws OrderNotFoundException, ProductNotFoundException, InsufficientFundsException, UserNotFoundException, AccountNotFoundException {
 
-        if (payment.getOrder() == null || !orderService.existsById(payment.getOrder().getId())) {
-            assert payment.getOrder() != null;
-            throw new OrderNotFoundException("Order id= "+payment.getOrder().getId()+" not found, payment must have order");
-        }
+        Payment payment = paymentDTO.toPayment(orderService);
         Order order = payment.getOrder();
 
-        // checks if the funds are sufficient
-        if (payment.getAmount() < order.getTotalPrice()) {
-            throw new InsufficientFundsException("Insufficient funds! Required amount, R " + order.getTotalPrice() + " but you provided R " + payment.getAmount());
+        if (order == null || !orderService.existsById(order.getId())) {
+            throw new OrderNotFoundException("Null order, payment must have order");
         }
 
-        PaymentStatusHistory paymentStatusHistory = new PaymentStatusHistory();
+        Account account = accountService.findByUserId(order.getUser().getId());
 
-        // save payment to db so we can have its id
-        payment = paymentRepository.save(payment);
-
-        // if they are paying more than they should, we give them a change
-        if (payment.getAmount() > order.getTotalPrice()) {
-            refundUser(payment.getAmount() - order.getTotalPrice());
-            paymentStatusHistory.setStatus(Status.SETTLED_WITH_CHANGE);
+        switch (payment.getPaymentMethod()) {
+            case BOTH -> payment = bothPayment(payment, order.getTotalPrice(), account.getId());
+            case CARD -> payment = cardPayment(payment, order.getTotalPrice(), account.getId());
+            case ACCOUNT -> payment = accountPayment(payment, order.getTotalPrice(), account.getId());
         }
-
-        // if the amount paid is equal to the orders' total price,
-        if (payment.getAmount() == order.getTotalPrice()) {
-            paymentStatusHistory.setStatus(Status.SETTLED);
-        }
-
-        // then link the statuses to a payment
-        // will automatically link the payment to statuses in visa-versa
-        paymentStatusHistory.setPayment(payment);
-        paymentStatusHistory.setDateTime(LocalDateTime.now());
-
-        payment.getPaymentStatusHistory().add(paymentStatusHistoryRepository.save(paymentStatusHistory));
-        //we now return the payment
+        OrderStatusHistory orderStatusHistory = new OrderStatusHistory();
+        orderStatusHistory.setStatus(Status.PAID);  // after paying, we update order status to 'PAID'
+        order.getOrderStatusHistories().add(orderStatusHistory);
+        orderStatusHistory.setOrder(orderService.update(order)); // update order, let status reference it,
+        orderStatusHistoryRepository.save(orderStatusHistory); // save it to database
         return payment;
     }
 
@@ -88,12 +76,53 @@ public class PaymentServiceImpl implements PaymentService {
         return paymentRepository.save(payment);
     }
 
-    public void refundUser(double amount) {
-
-    }
-
     @Override
     public List<Payment> findAll() {
         return paymentRepository.findAll();
+    }
+
+    //if the user pays from their back accounts, we call this method
+    private Payment cardPayment(Payment payment, double orderTotalPrice, Long accountId) throws InsufficientFundsException, AccountNotFoundException, UserNotFoundException {
+        Long userId=payment.getOrder().getUser().getId();
+        // checks if the funds are sufficient
+        if (payment.getAmount() < orderTotalPrice) {
+            throw new InsufficientFundsException("Insufficient funds! Required amount, R " + orderTotalPrice + " but you provided R " + payment.getAmount());
+        }
+
+        // tracks the payment status history
+        PaymentStatusHistory paymentStatusHistory = new PaymentStatusHistory();
+
+        // if they are paying more than they should, we give them a change
+        if (payment.getAmount() > orderTotalPrice) {
+            // we deposit the change to their app account,
+            accountService.fundAccount(accountId, payment.getAmount() - orderTotalPrice);
+            // with all these updates on account, we use status to flag changes made so far
+            AccountStatusHistory accountStatusHistory=new AccountStatusHistory();
+            accountStatusHistory.setDateTime(LocalDateTime.now());
+            accountStatusHistory.setAccount(accountService.findByUserId(userId));
+            accountStatusHistory.setStatus(Status.FUNDED);
+            // save the status to db
+            accountStatusHistoryRepository.save(accountStatusHistory);
+            paymentStatusHistory.setStatus(Status.SETTLED_WITH_CHANGE);
+        }
+
+        // if the amount paid is equal to the orders' total price,
+        if (payment.getAmount() == orderTotalPrice) {
+            paymentStatusHistory.setStatus(Status.SETTLED);
+        }
+
+        payment = paymentRepository.save(payment); // save payment so we can get its ID
+        paymentStatusHistory.setPayment(payment); // link the status to payment, since it must reference the payment
+        paymentStatusHistory.setDateTime(LocalDateTime.now());
+        paymentStatusHistoryRepository.save(paymentStatusHistory); //save the status
+        return payment;
+    }
+
+    public Payment accountPayment(Payment payment, double orderTotalPrice, Long accountId) {
+        return payment;
+    }
+
+    public Payment bothPayment(Payment payment, double orderTotalPrice, Long accountId) {
+        return payment;
     }
 }

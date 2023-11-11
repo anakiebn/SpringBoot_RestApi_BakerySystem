@@ -26,7 +26,7 @@ public class User {
     private String username;
 
     @Enumerated(EnumType.STRING)
-    private Role role;
+    private Role role=Role.CUSTOMER_ROLE;
 
     @Column(nullable = false,length = 50,unique = true)
     private String email;

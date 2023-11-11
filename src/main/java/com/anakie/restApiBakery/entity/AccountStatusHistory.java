@@ -17,14 +17,14 @@ public class AccountStatusHistory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private LocalDateTime dateTime;
+    private LocalDateTime dateTime=LocalDateTime.now();
 
+    @Enumerated(EnumType.STRING)
     private Status status;
 
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name="account_id")
     private Account account;
-
 
 }

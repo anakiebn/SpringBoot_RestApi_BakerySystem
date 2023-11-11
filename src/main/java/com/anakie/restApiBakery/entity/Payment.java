@@ -28,4 +28,7 @@ public class Payment {
     @Column(scale = 3)
     private double amount;
 
+    @Enumerated(EnumType.STRING)
+    private PAYMENT_METHOD paymentMethod;
+
 }
