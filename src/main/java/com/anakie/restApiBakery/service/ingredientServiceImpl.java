@@ -36,7 +36,7 @@ public class ingredientServiceImpl implements IngredientService {
         if (!ingredientRepository.existsById(id)) {
             throw new IngredientNotFoundException("Can't delete ingredient " + id + " not found, use an existing id!");
         }
-        ingredientRepository.deleteIngredientById(id);
+        ingredientRepository.deleteById(id);
     }
 
 

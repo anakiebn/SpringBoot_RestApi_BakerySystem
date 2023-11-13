@@ -24,44 +24,25 @@ public class RecipeController {
     @Autowired
     private RecipeService recipeService;
     @GetMapping("/{id}")
-    public ResponseEntity<Recipe> getRecipeById(@PathVariable Long id){
-        try {
+    public ResponseEntity<Recipe> getRecipeById(@PathVariable Long id) throws RecipeNotFoundException {
             return new ResponseEntity<>(recipeService.getRecipeById(id), HttpStatus.OK);
-        }catch (RecipeNotFoundException ex){
-            log.error("Exception occurred: "+ex.getMessage());
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }catch (Exception ex){
-            log.error("Exception occurred: "+ex.getMessage());
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+
     }
     @GetMapping
     public ResponseEntity<List<Recipe>> findAll(){
-        try {
             return new ResponseEntity<>(recipeService.getAllRecipes(), HttpStatus.OK);
-        }catch (Exception ex){
-            log.error("Exception occurred: "+ex.getMessage());
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+
     }
     @PostMapping
-    public ResponseEntity<Recipe> save(@RequestBody Recipe recipe){
-        try {
+    public ResponseEntity<Recipe> save(@RequestBody Recipe recipe) throws IngredientNotFoundException, SQLIntegrityConstraintViolationException, MissingIngredientException {
             return new ResponseEntity<>(recipeService.addRecipe(recipe), HttpStatus.OK);
-        }catch(MissingIngredientException | SQLIntegrityConstraintViolationException | IngredientNotFoundException ex){
-            log.error("Exception occurred: "+ex.getMessage());
-            return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
-        }
     }
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteById(@PathVariable Long id){
-        try {
+    public ResponseEntity<String> deleteById(@PathVariable Long id) throws RecipeNotFoundException {
+
             recipeService.deleteRecipeById(id);
             return new ResponseEntity<>("Recipe id: "+id+" successfully removed", HttpStatus.GONE);
-        } catch (RecipeNotFoundException e) {
-            log.error("Exception occurred: "+e.getMessage());
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+
     }
 
 

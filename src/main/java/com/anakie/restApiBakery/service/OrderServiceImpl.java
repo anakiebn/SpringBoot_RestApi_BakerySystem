@@ -75,7 +75,7 @@ public class OrderServiceImpl implements OrderService {
         if (!orderRepository.existsById(id)) {
             throw new OrderNotFoundException("Can't delete order " + id + " not found, use an existing id!");
         }
-        orderRepository.deleteOrderById(id);
+        orderRepository.deleteById(id);
     }
 
 

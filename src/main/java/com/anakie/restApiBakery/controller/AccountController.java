@@ -21,13 +21,8 @@ public class AccountController {
     private AccountService accountService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<Account> findById(@PathVariable("id") Long id) {
-        try {
+    public ResponseEntity<Account> findById(@PathVariable("id") Long id) throws AccountNotFoundException {
             return new ResponseEntity<>(accountService.findById(id), HttpStatus.OK);
-        } catch (AccountNotFoundException ex) {
-            log.error("Exception occurred: " + ex.getMessage());
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
     }
 
     @GetMapping
@@ -41,13 +36,8 @@ public class AccountController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteById(@PathVariable Long id) {
-        try {
+    public ResponseEntity<String> deleteById(@PathVariable Long id) throws AccountNotFoundException {
             accountService.deleteById(id);
             return new ResponseEntity<>("Account "+id+" successfully deleted", HttpStatus.GONE);
-        } catch (AccountNotFoundException ex) {
-            log.error("Exception occurred: " + ex.getMessage());
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
     }
 }

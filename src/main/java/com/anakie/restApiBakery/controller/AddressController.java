@@ -17,14 +17,10 @@ public class AddressController {
     private AddressService addressService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<Address> findById(@PathVariable Long id) {
-        try {
+    public ResponseEntity<Address> findById(@PathVariable Long id) throws AddressNotFoundException {
+
             log.info("Getting address by ID: {}", id);
             return new ResponseEntity<>(addressService.findById(id), HttpStatus.OK);
-        } catch (AddressNotFoundException ex) {
-            log.error("Exception occurred: " + ex.getMessage());
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
     }
 
     @PostMapping
@@ -35,23 +31,14 @@ public class AddressController {
     }
 
     @PutMapping
-    public ResponseEntity<Address> update(@RequestBody Address address) {
-        try {
+    public ResponseEntity<Address> update(@RequestBody Address address) throws AddressNotFoundException {
+
             return new ResponseEntity<>(addressService.update(address), HttpStatus.ACCEPTED);
-        } catch (AddressNotFoundException ex) {
-            log.error("Exception occurred: " + ex.getMessage());
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteById(@PathVariable Long id) {
-        try {
+    public ResponseEntity<String> deleteById(@PathVariable Long id) throws AddressNotFoundException {
             addressService.deleteById(id);
             return new ResponseEntity<>("Address id: "+id+", successfully deleted ", HttpStatus.OK);
-        } catch (AddressNotFoundException ex) {
-            log.error("Exception occurred: " + ex.getMessage());
-            return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
-        }
     }
 }

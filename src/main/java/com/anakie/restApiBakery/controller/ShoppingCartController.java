@@ -1,7 +1,7 @@
 package com.anakie.restApiBakery.controller;
 
 import com.anakie.restApiBakery.entity.ShoppingCart;
-import com.anakie.restApiBakery.exception.ShoppingCartNotFound;
+import com.anakie.restApiBakery.exception.ShoppingCartNotFoundException;
 import com.anakie.restApiBakery.service.ShoppingCartService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,20 +18,16 @@ public class ShoppingCartController {
     private ShoppingCartService shoppingCartService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<ShoppingCart> findById(@PathVariable Long id){
-        try {
+    public ResponseEntity<ShoppingCart> findById(@PathVariable Long id) throws ShoppingCartNotFoundException {
+
             return new ResponseEntity<>(shoppingCartService.findById(id), HttpStatus.OK);
-        } catch (ShoppingCartNotFound e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+
     }
     @PostMapping
-    public ResponseEntity<ShoppingCart> save(@RequestBody ShoppingCart shoppingCart){
-        try {
+    public ResponseEntity<ShoppingCart> save(@RequestBody ShoppingCart shoppingCart) throws Exception {
+
             return new ResponseEntity<>(shoppingCartService.save(shoppingCart), HttpStatus.OK);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+
     }
 
     @GetMapping

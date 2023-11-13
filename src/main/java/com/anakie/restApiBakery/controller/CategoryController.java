@@ -19,41 +19,23 @@ public class CategoryController {
     @Autowired
     private CategoryService categoryService;
     @GetMapping("/{id}")
-    public ResponseEntity<Category> findById(@PathVariable Long id){
-        try {
+    public ResponseEntity<Category> findById(@PathVariable Long id) throws CategoryNotFoundException {
             return new ResponseEntity<>(categoryService.findById(id), HttpStatus.OK);
-        }catch (Exception ex){
-            log.error("Exception occurred: "+ex.getMessage());
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
     }
     @GetMapping
     public ResponseEntity<List<Category>> findAll(){
-        try {
+
             return new ResponseEntity<>(categoryService.findAll(), HttpStatus.OK);
-        }
-        catch (Exception ex){
-            log.error("Exception occurred: "+ex.getMessage());
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
     }
     @PostMapping
     public ResponseEntity<Category> save(@RequestBody Category category){
-        try {
+
             return new ResponseEntity<>(categoryService.save(category), HttpStatus.OK);
-        } catch (Exception ex){
-            log.error("Exception occurred: "+ex.getCause());
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+
     }
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteById(@PathVariable Long id){
-        try {
-            categoryService.deleteById(id);
+    public ResponseEntity<String> deleteById(@PathVariable Long id) throws CategoryNotFoundException {
+        categoryService.deleteById(id);
             return new ResponseEntity<>("Category id: "+id+" successfully removed", HttpStatus.GONE);
-        }catch (Exception ex){
-            log.error("Exception occurred: "+ex.getMessage());
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
     }
 }

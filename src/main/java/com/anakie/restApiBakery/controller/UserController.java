@@ -22,13 +22,8 @@ public class UserController {
     private UserService userService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> findById(@PathVariable("id") Long id) {
-        try {
+    public ResponseEntity<User> findById(@PathVariable("id") Long id) throws UserNotFoundException {
             return new ResponseEntity<>(userService.findById(id), HttpStatus.OK);
-        } catch (UserNotFoundException ex) {
-            log.error("Exception occurred: " + ex.getMessage());
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
     }
 
     @GetMapping
@@ -37,37 +32,21 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<User> save(@RequestBody User user) {
-        try {
+    public ResponseEntity<User> save(@RequestBody User user) throws DuplicateEmailException {
             return new ResponseEntity<>(userService.save(user), HttpStatus.CREATED);
-        } catch (DuplicateEmailException ex) {
-            log.error("Exception occurred: " + ex.getMessage());
-            return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
-        }
     }
 
     @PostMapping("/address/{id}")
-    public ResponseEntity<User> saveAddress(@RequestBody Address address, @PathVariable Long id) {
-
-        try {
-
+    public ResponseEntity<User> saveAddress(@RequestBody Address address, @PathVariable Long id) throws Exception {
             return new ResponseEntity<>(userService.saveAddress(address, id), HttpStatus.CREATED);
-        } catch (Exception ex) {
-            log.error("Exception occurred: " + ex.getMessage());
-            return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
-        }
     }
 
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteById(@PathVariable Long id) {
-        try {
+    public ResponseEntity<String> deleteById(@PathVariable Long id) throws UserNotFoundException {
+
             userService.deleteById(id);
             return new ResponseEntity<>("User "+id+" successfully deleted", HttpStatus.GONE);
-        } catch (UserNotFoundException ex) {
-            log.error("Exception occurred: " + ex.getMessage());
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
     }
 
 }

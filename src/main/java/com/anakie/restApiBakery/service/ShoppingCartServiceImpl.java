@@ -130,24 +130,24 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     }
 
     @Override
-    public void deleteById(Long id) throws ShoppingCartNotFound {
+    public void deleteById(Long id) throws ShoppingCartNotFoundException {
         if (shoppingCartRepository.findById(id).isEmpty()) {
-            throw new ShoppingCartNotFound("Shopping cart of id: " + id + " not found, can't delete");
+            throw new ShoppingCartNotFoundException("Shopping cart of id: " + id + " not found, can't delete");
         }
         shoppingCartRepository.deleteById(id);
     }
 
     @Override
-    public ShoppingCart update(ShoppingCart shoppingCart) throws ShoppingCartNotFound {
+    public ShoppingCart update(ShoppingCart shoppingCart) throws ShoppingCartNotFoundException {
         if (shoppingCartRepository.findById(shoppingCart.getId()).isEmpty()) {
-            throw new ShoppingCartNotFound("Shopping cart of id: " + shoppingCart.getId() + " not found, can't update");
+            throw new ShoppingCartNotFoundException("Shopping cart of id: " + shoppingCart.getId() + " not found, can't update");
         }
         return shoppingCartRepository.save(shoppingCart);
     }
 
     @Override
-    public ShoppingCart findById(Long id) throws ShoppingCartNotFound {
-        return shoppingCartRepository.findById(id).orElseThrow(() -> new ShoppingCartNotFound("Shopping cart of id: " + id + " not found, can't update"));
+    public ShoppingCart findById(Long id) throws ShoppingCartNotFoundException {
+        return shoppingCartRepository.findById(id).orElseThrow(() -> new ShoppingCartNotFoundException("Shopping cart of id: " + id + " not found, can't update"));
     }
 
     @Override
@@ -156,9 +156,9 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     }
 
     @Override
-    public boolean cartValid(ShoppingCart shoppingCart) throws ShoppingCartNotFound, CartEmptyException, ProductNotFoundException {
+    public boolean cartValid(ShoppingCart shoppingCart) throws ShoppingCartNotFoundException, CartEmptyException, ProductNotFoundException {
         if (shoppingCart == null) {
-            throw new ShoppingCartNotFound("Shopping cart not found!");
+            throw new ShoppingCartNotFoundException("Shopping cart not found!");
         }
         if (shoppingCart.getCartItems() == null) {
             throw new CartEmptyException("Cart is empty, no products available");

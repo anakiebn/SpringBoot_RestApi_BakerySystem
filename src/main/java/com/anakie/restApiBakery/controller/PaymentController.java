@@ -2,6 +2,7 @@ package com.anakie.restApiBakery.controller;
 
 import com.anakie.restApiBakery.entity.Payment;
 import com.anakie.restApiBakery.entity.PaymentDTO;
+import com.anakie.restApiBakery.exception.*;
 import com.anakie.restApiBakery.service.OrderService;
 import com.anakie.restApiBakery.service.PaymentService;
 import lombok.extern.slf4j.Slf4j;
@@ -20,43 +21,29 @@ public class PaymentController {
     @Autowired
     private PaymentService paymentService;
     @GetMapping("/{id}")
-    public ResponseEntity<Payment> findById(@PathVariable Long id) {
-        try {
+    public ResponseEntity<Payment> findById(@PathVariable Long id) throws PaymentNotFoundException {
+
             return new ResponseEntity<>(paymentService.findById(id), HttpStatus.OK);
-        } catch (Exception ex) {
-            log.error("Exception occurred: " + ex.getMessage());
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+
     }
 
     @GetMapping
     public ResponseEntity<List<Payment>> findAll() {
-        try {
+
             return new ResponseEntity<>(paymentService.findAll(), HttpStatus.OK);
-        } catch (Exception ex) {
-            log.error("Exception occurred: " + ex.getMessage());
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }
     }
 
     @PostMapping
-    public ResponseEntity<Payment> save(@RequestBody PaymentDTO paymentDTO) {
-        try {
+    public ResponseEntity<Payment> save(@RequestBody PaymentDTO paymentDTO) throws OrderNotFoundException, UserNotFoundException, InsufficientFundsException, ProductNotFoundException, AccountNotFoundException {
+
             return new ResponseEntity<>(paymentService.save(paymentDTO), HttpStatus.CREATED);
-        } catch (Exception ex) {
-            log.error("Exception occurred: " + ex.getMessage());
-            return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
-        }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteById(@PathVariable Long id) {
-        try {
+    public ResponseEntity<String> deleteById(@PathVariable Long id) throws PaymentNotFoundException {
+
             paymentService.deleteById(id);
             return new ResponseEntity<>("Payment id: " + id + " successfully removed", HttpStatus.GONE);
-        } catch (Exception ex) {
-            log.error("Exception occurred: " + ex.getMessage());
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+
     }
 }

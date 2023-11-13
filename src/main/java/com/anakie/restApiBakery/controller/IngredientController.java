@@ -21,45 +21,25 @@ public class IngredientController {
     @Autowired
     private IngredientService ingredientService;
     @GetMapping("/{id}")
-    public ResponseEntity<Ingredient> findById(@PathVariable Long id){
-        try {
-             return new ResponseEntity<>(ingredientService.findById(id), HttpStatus.OK);
-        }catch (IngredientNotFoundException ex){
-            log.error("Exception occurred: "+ex.getMessage());
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }catch (Exception ex){
-            log.error("Exception occurred: "+ex.getMessage());
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public ResponseEntity<Ingredient> findById(@PathVariable Long id) throws IngredientNotFoundException {
+        return new ResponseEntity<>(ingredientService.findById(id), HttpStatus.OK);
     }
+
 
     @GetMapping
     public ResponseEntity<List<Ingredient> > findAll(){
-        try {
             return new ResponseEntity<>(ingredientService.findAll(), HttpStatus.OK);
-        }catch (Exception ex){
-            log.error("Exception occurred: "+ex.getMessage());
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
     }
     @PostMapping
     public ResponseEntity<Ingredient> save(@RequestBody Ingredient ingredient){
-        try {
             return new ResponseEntity<>(ingredientService.save(ingredient), HttpStatus.OK);
-        }catch (Exception ex){
-            log.error("Exception occurred: "+ex.getMessage());
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
     }
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteById(@PathVariable Long id){
-        try {
+    public ResponseEntity<String> deleteById(@PathVariable Long id) throws IngredientNotFoundException {
+
             ingredientService.deleteById(id);
             return new ResponseEntity<>("Ingredient id: "+id+" successfully removed", HttpStatus.GONE);
-        }catch (Exception ex){
-            log.error("Exception occurred: "+ex.getMessage());
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+
     }
 
 

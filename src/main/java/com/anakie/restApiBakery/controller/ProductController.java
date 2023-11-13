@@ -23,35 +23,27 @@ public class ProductController {
     @Autowired
     private ProductService productService;
     @GetMapping("/{id}")
-    public ResponseEntity<Product> findById(@PathVariable Long id){
-        try {
+    public ResponseEntity<Product> findById(@PathVariable Long id) throws ProductNotFoundException {
+
             return new ResponseEntity<>(productService.findById(id), HttpStatus.OK);
-        }catch (ProductNotFoundException ex){
-            log.error("Exception occurred: "+ex.getMessage());
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+
     }
     @GetMapping
     public ResponseEntity<List<Product>> findAll(){
             return new ResponseEntity<>(productService.findAll(), HttpStatus.OK);
     }
     @PostMapping
-    public ResponseEntity<Product> save(@RequestBody ProductDTO productDTO){
-        try {
+    public ResponseEntity<Product> save(@RequestBody ProductDTO productDTO) throws RecipeNotFoundException, CategoryNotFoundException {
+
             return new ResponseEntity<>(productService.save(productDTO), HttpStatus.OK);
-        }catch(RecipeNotFoundException | CategoryNotFoundException | PropertyValueException ex){
-            log.error("Exception occurred: "+ex.getMessage());
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+
     }
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteById(@PathVariable Long id){
-        try {
+    public ResponseEntity<String> deleteById(@PathVariable Long id) throws ProductNotFoundException {
+
             productService.deleteById(id);
             return new ResponseEntity<>("Product id: "+id+" Successfully removed", HttpStatus.GONE);
-        } catch (ProductNotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+
     }
 
 }

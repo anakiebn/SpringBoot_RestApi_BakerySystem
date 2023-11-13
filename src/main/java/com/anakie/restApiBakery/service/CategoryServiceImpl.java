@@ -37,7 +37,7 @@ public class CategoryServiceImpl implements CategoryService {
         if (!categoryRepository.existsById(id)) {
             throw new CategoryNotFoundException("Can't delete, category " + id + " not found! Use existing id");
         }
-        categoryRepository.deleteCategoryById(id);
+        categoryRepository.deleteById(id);
     }
 
     @Override

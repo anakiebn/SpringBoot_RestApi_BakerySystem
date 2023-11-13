@@ -2,6 +2,7 @@ package com.anakie.restApiBakery.controller;
 
 import com.anakie.restApiBakery.entity.Order;
 import com.anakie.restApiBakery.entity.OrderDTO;
+import com.anakie.restApiBakery.exception.OrderNotFoundException;
 import com.anakie.restApiBakery.service.OrderService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,44 +22,31 @@ public class OrderController {
     private OrderService orderService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<Order> findById(@PathVariable Long id) {
-        try {
+    public ResponseEntity<Order> findById(@PathVariable Long id) throws OrderNotFoundException {
+
             return new ResponseEntity<>(orderService.findById(id), HttpStatus.OK);
-        } catch (Exception ex) {
-            log.error("Exception occurred: " + ex.getMessage());
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+
     }
 
     @GetMapping
     public ResponseEntity<List<Order>> findAll() {
-        try {
+
             return new ResponseEntity<>(orderService.findAll(), HttpStatus.OK);
-        } catch (Exception ex) {
-            log.error("Exception occurred: " + ex.getMessage());
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }
+
     }
 
     @PostMapping
-    public ResponseEntity<Order> save(@RequestBody OrderDTO orderDTO) {
-        try {
+    public ResponseEntity<Order> save(@RequestBody OrderDTO orderDTO) throws Exception {
+
             return new ResponseEntity<>(orderService.save(orderDTO), HttpStatus.CREATED);
-        } catch (Exception ex) {
-            log.error("Exception occurred: " + ex.getMessage());
-            return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
-        }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteById(@PathVariable Long id) {
-        try {
+    public ResponseEntity<String> deleteById(@PathVariable Long id) throws OrderNotFoundException {
+
             orderService.deleteById(id);
             return new ResponseEntity<>("Order id: " + id + " successfully removed", HttpStatus.GONE);
-        } catch (Exception ex) {
-            log.error("Exception occurred: " + ex.getMessage());
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+
     }
 
 }
