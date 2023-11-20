@@ -8,6 +8,8 @@ import java.util.List;
 
 public interface OrderService {
 
+    void bakeProducts(Order order);
+    double calculateTotal(Order order);
     Order save(OrderDTO orderDTO) throws Exception;
     Order findById(Long id) throws OrderNotFoundException;
 

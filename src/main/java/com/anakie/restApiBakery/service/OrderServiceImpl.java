@@ -36,16 +36,15 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderDTO.toOrder(userService);
         ShoppingCart shoppingCart = shoppingCartService.save(order.getShoppingCart());
         order.setShoppingCart(shoppingCart);
-        // this method subtracts ingredients in database, since baking means using stock ingredients
-        bakeProducts(order);
+
         order.setTotalPrice(calculateTotal(order)); // set the total price of the order
         OrderStatusHistory orderStatusHistory = new OrderStatusHistory();
-        orderStatusHistory.setStatus(Status.PROCESSING_ORDER); // new orders are given this status
+        orderStatusHistory.setStatus(Status.Pending); // new orders are given this status
         orderStatusHistory.setOrder(order=orderRepository.save(order)); // save order to get its ID so the status can reference it
         orderStatusHistoryRepository.save(orderStatusHistory);
         return order;
     }
-    private double calculateTotal(Order order) throws ProductNotFoundException {
+    public double calculateTotal(Order order) throws ProductNotFoundException {
         double totalPrice = 0;
         for (CartItem cartItem : order.getShoppingCart().getCartItems()) {
             totalPrice += productService.totalAmount(cartItem.getProductId(), cartItem.getProductQty());
@@ -55,7 +54,7 @@ public class OrderServiceImpl implements OrderService {
 
       // once an order is made, we bake, when we bake we use ingredients, meaning, we subtract
      //  all used ingredients according to their recipe
-    private void bakeProducts(Order order) {
+    public void bakeProducts(Order order) {
         order.getShoppingCart().getCartItems().forEach(cartItem -> {
             try {
                 useIngredients(cartItem);

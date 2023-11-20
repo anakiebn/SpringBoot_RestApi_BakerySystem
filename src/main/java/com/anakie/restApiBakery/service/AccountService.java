@@ -19,6 +19,6 @@ public interface AccountService {
     Account update(Account account) throws AccountNotFoundException;
 
     double fundAccount(Long accountId, double amount) throws AccountNotFoundException;
-    double useFunds(Long accountId, double amount) throws AccountNotFoundException, InsufficientFundsException;
+//    double useFunds(Long accountId, double amount) throws AccountNotFoundException, InsufficientFundsException;
 
 }

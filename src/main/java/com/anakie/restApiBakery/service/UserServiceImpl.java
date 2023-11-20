@@ -47,7 +47,7 @@ public class UserServiceImpl implements UserService {
         account.setAmount(0); // by default, they will have R 0.00 balance
         account.setUser(user);
         AccountStatusHistory accountStatusHistory = new AccountStatusHistory();
-        accountStatusHistory.setStatus(Status.NEW); // new status of this account
+        accountStatusHistory.setStatus(Status.Active); // new status of this account
         accountStatusHistory.setDateTime(LocalDateTime.now());
         account.getAccountStatusHistories().add(accountStatusHistory);
         accountStatusHistory.setAccount(accountService.save(account));
