@@ -1,11 +1,10 @@
 package com.anakie.restApiBakery.service;
 
-import com.anakie.restApiBakery.entity.EmailDetails;
 import com.anakie.restApiBakery.entity.Order;
 import com.anakie.restApiBakery.entity.Payment;
-import jakarta.annotation.PostConstruct;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
@@ -19,24 +18,20 @@ import java.io.File;
 import java.util.Objects;
 import java.util.UUID;
 @Service
+@Slf4j
 public class EmailServiceImpl implements EmailService {
 
     @Autowired
     private JavaMailSender javaMailSender;
     private SimpleMailMessage simpleMailMessage;
-    private MimeMessageHelper mimeMessageHelper;
-    private MimeMessage mimeMessage;
+    @Autowired
+    private RecordService recordService;
 
     private String code;
     @Value("${spring.mail.username}")
     private String sender;
 
-//    @PostConstruct
-//    public void init() {
-//
-//        mimeMessage = javaMailSender.createMimeMessage();
-//        mimeMessageHelper = new MimeMessageHelper(mimeMessage);
-//    }
+
     @Override
     public void registrationEmail(String userEmail, String username) {
         simpleMailMessage = new SimpleMailMessage();
@@ -57,6 +52,7 @@ public class EmailServiceImpl implements EmailService {
 
 
         javaMailSender.send(simpleMailMessage); // send the email
+        log.info("Email sent to "+userEmail);
         
     }
 
@@ -76,53 +72,32 @@ public class EmailServiceImpl implements EmailService {
         simpleMailMessage.setFrom(sender);
         simpleMailMessage.setTo(userEmail);
         javaMailSender.send(simpleMailMessage);
+        log.info("Email sent to "+userEmail);
     }
 
     @Override
-    public void orderConfirmationEmail(Order order) throws MessagingException {
+    public void invoiceEmail(Payment payment) throws MessagingException {
+        log.info("Creating invoice email");
+        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+        MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
 
-        mimeMessage = javaMailSender.createMimeMessage();
-        mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
+        String body = "Download your invoice ## " + payment.getId()+"\nPayment method: "+payment.getPaymentMethod();
 
-              StringBuilder body = new StringBuilder();
-              body.append("Hello ").append(order.getUser().getUsername()).append("/n/n");
 
-        String subject = "Bakery Order confirmation";
+        String subject = "Bakery Order Invoice";
         mimeMessageHelper.setFrom(sender);
-        mimeMessageHelper.setTo(order.getUser().getEmail());
-        mimeMessageHelper.setText(body.toString());
+        mimeMessageHelper.setTo(payment.getOrder().getUser().getEmail());
+        mimeMessageHelper.setText(body);
         mimeMessageHelper.setSubject(subject);
-        String attachment="";
+
         // Adding the attachment
-        FileSystemResource file = new FileSystemResource(new File(attachment));
+        FileSystemResource file = new FileSystemResource(new File(recordService.invoice(payment.getOrder())));
 
         mimeMessageHelper.addAttachment(Objects.requireNonNull(file.getFilename()), file);
 
         // Sending the mail
         javaMailSender.send(mimeMessage);
-    }
-
-    @Override
-    public void paymentConfirmationEmail(Payment payment) throws MessagingException {
-//        mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
-//        StringBuilder body = new StringBuilder();
-//        String subject = "";
-//        mimeMessageHelper.setFrom(sender);
-//        mimeMessageHelper.setTo(payment.getOrder().getUser().getEmail());
-//        mimeMessageHelper.setText(body.toString());
-//        mimeMessageHelper.setSubject(subject);
-//
-//
-//        String attachment="";
-//        // Adding the attachment
-//        FileSystemResource file = new FileSystemResource(new File(attachment));
-//
-//        mimeMessageHelper.addAttachment(Objects.requireNonNull(file.getFilename()), file);
-//
-//        // Sending the mail
-//        javaMailSender.send(mimeMessage);
-
-
+        log.info("Email sent to "+payment.getOrder().getUser().getEmail());
     }
     public String getCode(){
         return code;

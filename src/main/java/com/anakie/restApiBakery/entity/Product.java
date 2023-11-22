@@ -25,6 +25,10 @@ public class Product {
     @JoinColumn(name = "recipe_id")
     private Recipe recipe;
 
+    private double weight;
+
+    private Unit unit=Unit.NO_UNIT;
+
     @ManyToOne(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     @JoinColumn(name ="category_id")
     private Category category;

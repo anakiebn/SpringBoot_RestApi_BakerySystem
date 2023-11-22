@@ -5,6 +5,7 @@ import com.anakie.restApiBakery.entity.PaymentDTO;
 import com.anakie.restApiBakery.exception.*;
 import com.anakie.restApiBakery.service.OrderService;
 import com.anakie.restApiBakery.service.PaymentService;
+import jakarta.mail.MessagingException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -34,7 +35,7 @@ public class PaymentController {
     }
 
     @PostMapping
-    public ResponseEntity<Payment> save(@RequestBody PaymentDTO paymentDTO) throws OrderNotFoundException, UserNotFoundException, InsufficientFundsException, ProductNotFoundException, AccountNotFoundException {
+    public ResponseEntity<Payment> save(@RequestBody PaymentDTO paymentDTO) throws OrderNotFoundException, UserNotFoundException, InsufficientFundsException, ProductNotFoundException, AccountNotFoundException, MessagingException {
 
             return new ResponseEntity<>(paymentService.save(paymentDTO), HttpStatus.CREATED);
     }

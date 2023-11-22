@@ -1,9 +1,11 @@
 package com.anakie.restApiBakery.entity;
 
+import com.anakie.restApiBakery.service.ProductService;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -36,5 +38,6 @@ public class Order {
 
     @Column(name="orderDateTime")
     private LocalDateTime dateTime=LocalDateTime.now();
+
 
 }

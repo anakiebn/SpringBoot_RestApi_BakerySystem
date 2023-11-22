@@ -52,6 +52,7 @@ public class OrderServiceImpl implements OrderService {
         return totalPrice;
     }
 
+
       // once an order is made, we bake, when we bake we use ingredients, meaning, we subtract
      //  all used ingredients according to their recipe
     public void bakeProducts(Order order) {

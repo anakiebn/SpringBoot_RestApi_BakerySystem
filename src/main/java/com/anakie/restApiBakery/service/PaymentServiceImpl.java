@@ -3,6 +3,7 @@ package com.anakie.restApiBakery.service;
 import com.anakie.restApiBakery.entity.*;
 import com.anakie.restApiBakery.exception.*;
 import com.anakie.restApiBakery.repository.*;
+import jakarta.mail.MessagingException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,20 +23,26 @@ public class PaymentServiceImpl implements PaymentService {
     private final OrderStatusHistoryRepository orderStatusHistoryRepository;
     private final AccountStatusHistoryRepository accountStatusHistoryRepository;
 
+
+    private final EmailService emailService;
+
+
+
     @Autowired
     public PaymentServiceImpl(PaymentRepository paymentRepository, OrderService orderService,
                               AccountService accountService, PaymentStatusHistoryRepository paymentStatusHistoryRepository, OrderStatusHistoryRepository orderStatusHistoryRepository,
-                              AccountStatusHistoryRepository accountStatusHistoryRepository) {
+                              AccountStatusHistoryRepository accountStatusHistoryRepository,EmailService emailService) {
         this.paymentRepository = paymentRepository;
         this.orderService = orderService;
         this.accountService = accountService;
         this.paymentStatusHistoryRepository = paymentStatusHistoryRepository;
         this.orderStatusHistoryRepository = orderStatusHistoryRepository;
         this.accountStatusHistoryRepository = accountStatusHistoryRepository;
+        this.emailService=emailService;
     }
 
     @Override
-    public Payment save(PaymentDTO paymentDTO) throws OrderNotFoundException, ProductNotFoundException, InsufficientFundsException, UserNotFoundException, AccountNotFoundException {
+    public Payment save(PaymentDTO paymentDTO) throws OrderNotFoundException, ProductNotFoundException, InsufficientFundsException, UserNotFoundException, AccountNotFoundException, MessagingException {
         Payment payment = paymentDTO.toPayment(orderService);
         Order order = payment.getOrder();
 
@@ -60,6 +67,9 @@ public class PaymentServiceImpl implements PaymentService {
         order.getOrderStatusHistories().add(orderStatusHistory);
         orderStatusHistory.setOrder(orderService.update(order)); // update order, let status reference it,
         orderStatusHistoryRepository.save(orderStatusHistory); // save it to database
+
+        //create and send invoice
+        emailService.invoiceEmail(payment);
 
         return payment;
     }
@@ -105,7 +115,7 @@ public class PaymentServiceImpl implements PaymentService {
 
         // just a stub to simulate other reasons that might cause payment to fail
         if (new Random().nextBoolean()) {
-            throw new PaymentFailedException("Payment failed, Try again");
+            throw new PaymentFailedException("Payment failed, Try again, just a drill/stub error ");
         }
 
         // if they are paying more than they should, we give them a change

@@ -9,8 +9,7 @@ public interface EmailService {
 
     void registrationEmail(String userEmail,String username);
     void passwordRecoveryEmail(String userEmail,String username);
-    void orderConfirmationEmail(Order order) throws MessagingException;
-    void paymentConfirmationEmail(Payment payment) throws MessagingException;
+    void invoiceEmail(Payment payment) throws MessagingException;
     String getCode();
 
 }
