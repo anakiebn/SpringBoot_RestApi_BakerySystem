@@ -22,7 +22,7 @@ public class ProductController {
 
     @Autowired
     private ProductService productService;
-    @GetMapping("/{id}")
+    @GetMapping("/id")
     public ResponseEntity<Product> findById(@PathVariable Long id) throws ProductNotFoundException {
 
             return new ResponseEntity<>(productService.findById(id), HttpStatus.OK);
@@ -32,13 +32,15 @@ public class ProductController {
     public ResponseEntity<List<Product>> findAll(){
             return new ResponseEntity<>(productService.findAll(), HttpStatus.OK);
     }
-    @PostMapping
+    @PostMapping("/save")
     public ResponseEntity<Product> save(@RequestBody ProductDTO productDTO) throws RecipeNotFoundException, CategoryNotFoundException {
-
             return new ResponseEntity<>(productService.save(productDTO), HttpStatus.OK);
-
     }
-    @DeleteMapping("/{id}")
+    @PostMapping("/update")
+    public ResponseEntity<Product> update(@RequestBody ProductDTO productDTO) throws RecipeNotFoundException, CategoryNotFoundException {
+        return new ResponseEntity<>(productService.update(productDTO), HttpStatus.OK);
+    }
+    @DeleteMapping("/id")
     public ResponseEntity<String> deleteById(@PathVariable Long id) throws ProductNotFoundException {
 
             productService.deleteById(id);

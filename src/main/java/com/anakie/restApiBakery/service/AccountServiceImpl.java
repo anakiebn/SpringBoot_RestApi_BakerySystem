@@ -5,16 +5,20 @@ import com.anakie.restApiBakery.entity.AccountStatusHistory;
 import com.anakie.restApiBakery.entity.Status;
 import com.anakie.restApiBakery.exception.AccountNotFoundException;
 import com.anakie.restApiBakery.exception.InsufficientFundsException;
+import com.anakie.restApiBakery.exception.NegativeAmountException;
 import com.anakie.restApiBakery.repository.AccountRepository;
 import com.anakie.restApiBakery.repository.AccountStatusHistoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.DateFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
-public class AccountServiceImpl implements AccountService{
+public class AccountServiceImpl implements AccountService {
 
     @Autowired
     private AccountRepository accountRepository;
@@ -23,20 +27,40 @@ public class AccountServiceImpl implements AccountService{
 
     @Override
     public Account save(Account account) {
+        if (account == null) {
+            throw new NullPointerException("Null account not allowed, provide none-null object");
+        }
         return accountRepository.save(account);
     }
+
     @Override
     public Account findById(Long id) throws AccountNotFoundException {
-        return accountRepository.findById(id).orElseThrow(()->new AccountNotFoundException("Account id= "+id+" not found"));
+        return accountRepository.findById(id).orElseThrow(() -> new AccountNotFoundException("Account id= " + id + " not found"));
     }
+
     @Override
-    public Account findByUserId(Long userId) throws AccountNotFoundException{
-        return accountRepository.findByUserId(userId).orElseThrow(()->
-                new AccountNotFoundException("Account for user= "+userId+" not found!"));
+    public Account findByUserId(Long userId) throws AccountNotFoundException {
+        return accountRepository.findByUserId(userId).orElseThrow(() ->
+                new AccountNotFoundException("Account for user= " + userId + " not found!"));
     }
+
     @Override
     public List<Account> findAll() {
         return accountRepository.findAll();
+    }
+
+    @Override
+    public void changeAccountStatus(Account account, Status status) {
+        if (!accountRepository.existsById(account.getId())) {
+            throw new AccountNotFoundException("Can't change status, account not found, provide valid account");
+        }
+        AccountStatusHistory accountStatusHistory = new AccountStatusHistory();
+        accountStatusHistory.setAccount(account);
+        accountStatusHistory.setDateTime(LocalDateTime.now());
+        accountStatusHistory.setStatus(status);
+
+        accountStatusHistoryRepository.save(accountStatusHistory);
+
     }
 
     @Override
@@ -47,58 +71,62 @@ public class AccountServiceImpl implements AccountService{
     @Override
     public Account update(Account account) throws AccountNotFoundException {
 
-       if(!accountRepository.existsById(account.getId())){
-           throw new AccountNotFoundException("Account not found, use existing account!");
+        if (!accountRepository.existsById(account.getId())) {
+            throw new AccountNotFoundException("Account not found, use existing account!");
         }
         return accountRepository.save(account);
     }
 
+
+    // when a user decides to fund the account directly/ or save some change
     @Override
-    public double fundAccount(Long accountId, double amount) throws AccountNotFoundException {
-        Account account=accountRepository.findById(accountId).orElseThrow(
-                ()->new AccountNotFoundException("Account not found, use existing account!"));
-        // if it's not negative
-        if(amount>0){
-            AccountStatusHistory accountStatusHistory=new AccountStatusHistory();
-            // fund account
-            account.setAmount(account.getAmount()+amount);
-            accountStatusHistory.setDateTime(LocalDateTime.now());
-            // update status
-            accountStatusHistory.setStatus(Status.Funded);
-            // we add the account status
-            account.getAccountStatusHistories().add(accountStatusHistory);
-            accountRepository.save(account);
+    public void fundAccount(Account account, double amount, Status status) throws AccountNotFoundException {
+        // if the amount is negative
+        if (amount < 0) {
+            throw new NegativeAmountException("Negative deposit not allowed");
         }
-        // return the accounts balance
-        return account.getAmount();
+        account.setAmount(account.getAmount() + amount); // fund account
+        accountRepository.save(account); // update account
+
+        AccountStatusHistory accountStatusHistory = new AccountStatusHistory();  // update status
+        accountStatusHistory.setDateTime(LocalDateTime.now());
+        accountStatusHistory.setStatus(status);
+        accountStatusHistory.setAccount(account); // link the status to account
+        accountStatusHistoryRepository.save(accountStatusHistory);
+
     }
 
-//
-//    @Override
-//    public double useFunds(Long accountId, double amount) throws AccountNotFoundException, InsufficientFundsException {
-//        Account account=accountRepository.findById(accountId).orElseThrow(
-//                ()->new AccountNotFoundException("Account not found, use existing account!"));
-//
-//        // check if we have enough funds
-//        if(amount>account.getAmount()){
-//            throw new InsufficientFundsException("Insufficient funds! Fund account");
-//        }
-//        // we make sure that it's not negative amount
-//        if(amount>0){
-//            AccountStatusHistory accountStatusHistory=new AccountStatusHistory();
-//            // use account funds
-//            account.setAmount(account.getAmount()-amount);
-//
-//            accountStatusHistory.setDateTime(LocalDateTime.now());
-//            // update status
-//            accountStatusHistory.setStatus(Status.Paid_With_Account);
-//            // we add the account status
-//            account.getAccountStatusHistories().add(accountStatusHistory);
-//            accountRepository.save(account);
-//            accountStatusHistoryRepository.save(accountStatusHistory);
-//        }
-//        //return the accounts balance
-//        return account.getAmount();
-//
-//    }
+
+    // when a user pays with account
+    @Override
+    public void useFunds(Account account, double amount,Status status,int operation) throws Exception {
+
+        // if the amount is negative
+        if (amount < 0) {
+            throw new NegativeAmountException("Negative payment not allowed");
+        }
+        // operation 1= means we're paying with a card and account
+        // operation 0= means we're paying with an account only
+        // check if we have enough funds
+        if (operation==0 && amount > account.getAmount()) {
+            throw new InsufficientFundsException("Insufficient funds! Fund account");
+        }else if(operation==1){
+            account.setAmount(account.getAmount() - amount); // use account funds
+            accountRepository.save(account); // update account
+
+            AccountStatusHistory accountStatusHistory = new AccountStatusHistory();
+            accountStatusHistory.setDateTime(LocalDateTime.now());
+            accountStatusHistory.setAccount(account);
+            accountStatusHistory.setStatus(status);
+            accountStatusHistoryRepository.save(accountStatusHistory); // update account status
+        }else{
+            throw new Exception("Code error occured, We only have 2 operations numbered 0 and 1 only");
+        }
+
+
+
+
+    }
+
+
 }

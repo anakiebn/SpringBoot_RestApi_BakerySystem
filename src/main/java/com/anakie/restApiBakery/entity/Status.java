@@ -12,17 +12,16 @@ public enum Status {
 
 
     // Order Statuses:
-    Confirmed, // Order has been confirmed and is pending processing.
-    In_Progress, // Order is currently being processed.
-    Delivered, // Order has been successfully delivered to the customer.
-     // Account Statuses:
-    Active, // The account is active and in good standing.
-    Inactive, //The account is temporarily inactive.
-    Funded,
-     Closed, // The account has been permanently closed.
-    Suspended, // Account activity has been suspended, possibly due to a violation of terms.
-    Frozen, // Account transactions are temporarily restricted.
 
-    Paid_With_Account,
-    Got_Change
+    Processing, // Order is currently being processed.
+    Preparing, // after payment, we prepare the order
+    Delivering, // we then deliver the order
+    Delivered, // Order has been successfully delivered to the customer.
+
+     // Account Statuses:
+    Funded,  // when a users directly funds it So they can pay with app account cash
+    Paid_With_Account, // when we pay using an app account
+    Got_Change // when they receive change
+    ,
+    New
 }

@@ -10,11 +10,11 @@ import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 
 public interface RecipeService {
-    Recipe addRecipe(Recipe recipe) throws MissingIngredientException, IngredientNotFoundException, SQLIntegrityConstraintViolationException;
-    Recipe getRecipeById(Long id) throws RecipeNotFoundException;
+    Recipe save(Recipe recipe) throws MissingIngredientException, IngredientNotFoundException, SQLIntegrityConstraintViolationException;
+    Recipe findById(Long id) throws RecipeNotFoundException;
     void deleteRecipeById(Long id) throws RecipeNotFoundException;
-    Recipe updateRecipe(Recipe recipe) throws RecipeNotFoundException, IngredientNotFoundException, SQLIntegrityConstraintViolationException, MissingIngredientException;
-    List<Recipe> getAllRecipes();
+    Recipe update(Recipe recipe) throws RecipeNotFoundException, IngredientNotFoundException, SQLIntegrityConstraintViolationException, MissingIngredientException;
+    List<Recipe> findAll();
     public Recipe addRecipeIngredients(List<RecipeIngredient> recipeIngredients, Long recipeId) throws RecipeNotFoundException;
 
     boolean existsById(Long recipeId);

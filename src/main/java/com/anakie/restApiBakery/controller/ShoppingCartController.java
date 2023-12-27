@@ -17,18 +17,25 @@ public class ShoppingCartController {
     @Autowired
     private ShoppingCartService shoppingCartService;
 
-    @GetMapping("/{id}")
+    @GetMapping("/id")
     public ResponseEntity<ShoppingCart> findById(@PathVariable Long id) throws ShoppingCartNotFoundException {
 
             return new ResponseEntity<>(shoppingCartService.findById(id), HttpStatus.OK);
 
     }
-    @PostMapping
+    @PostMapping("/save")
     public ResponseEntity<ShoppingCart> save(@RequestBody ShoppingCart shoppingCart) throws Exception {
 
             return new ResponseEntity<>(shoppingCartService.save(shoppingCart), HttpStatus.OK);
 
     }
+    @PostMapping("/update")
+    public ResponseEntity<ShoppingCart> update(@RequestBody ShoppingCart shoppingCart) throws Exception {
+
+        return new ResponseEntity<>(shoppingCartService.update(shoppingCart), HttpStatus.OK);
+
+    }
+
 
     @GetMapping
     public ResponseEntity<List<ShoppingCart>> findAll(){

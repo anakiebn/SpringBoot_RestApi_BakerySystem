@@ -1,12 +1,15 @@
 package com.anakie.restApiBakery.service;
 
+import ch.qos.logback.core.spi.ErrorCodes;
 import com.anakie.restApiBakery.entity.Category;
 import com.anakie.restApiBakery.exception.CategoryNotFoundException;
 import com.anakie.restApiBakery.repository.CategoryRepository;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
+import java.sql.SQLException;
 import java.util.List;
 
 @Service
@@ -16,9 +19,18 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public Category save(Category category) throws ConstraintViolationException {
-//        if(categoryRepository.findAll().stream().anyMatch(cat->cat.getName().equalsIgnoreCase(category.getName()))){
-//            throw new ConstraintViolationException();
-//        }
+        if(category==null){
+            throw new NullPointerException("Null category object not allowed, fix it");
+        }
+        if (category.getName() == null) {
+            String errorMessage = "Null category name not allowed, please provide a valid name.";
+            throw new ConstraintViolationException(errorMessage, new SQLException("Null category name"), "CATEGORY_NAME_NOT_NULL");
+        }
+
+        if(categoryRepository.findAll().stream().anyMatch(cat->cat.getName().equalsIgnoreCase(category.getName()))){
+            String errorMessage = "Duplicate category names not allowed, provide unique name";
+            throw new ConstraintViolationException(errorMessage, new SQLException("Duplicate category name"), "UNIQUE_CATEGORY_NAME");
+        }
         return categoryRepository.save(category);
     }
 

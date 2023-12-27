@@ -1,6 +1,5 @@
 package com.anakie.restApiBakery.controller;
 
-import com.anakie.restApiBakery.entity.Ingredient;
 import com.anakie.restApiBakery.entity.Recipe;
 import com.anakie.restApiBakery.exception.IngredientNotFoundException;
 import com.anakie.restApiBakery.exception.MissingIngredientException;
@@ -23,21 +22,25 @@ public class RecipeController {
 
     @Autowired
     private RecipeService recipeService;
-    @GetMapping("/{id}")
-    public ResponseEntity<Recipe> getRecipeById(@PathVariable Long id) throws RecipeNotFoundException {
-            return new ResponseEntity<>(recipeService.getRecipeById(id), HttpStatus.OK);
+    @GetMapping("/id")
+    public ResponseEntity<Recipe> findById(@PathVariable Long id) throws RecipeNotFoundException {
+            return new ResponseEntity<>(recipeService.findById(id), HttpStatus.OK);
 
     }
     @GetMapping
     public ResponseEntity<List<Recipe>> findAll(){
-            return new ResponseEntity<>(recipeService.getAllRecipes(), HttpStatus.OK);
+            return new ResponseEntity<>(recipeService.findAll(), HttpStatus.OK);
 
     }
-    @PostMapping
+    @PostMapping("/save")
     public ResponseEntity<Recipe> save(@RequestBody Recipe recipe) throws IngredientNotFoundException, SQLIntegrityConstraintViolationException, MissingIngredientException {
-            return new ResponseEntity<>(recipeService.addRecipe(recipe), HttpStatus.OK);
+            return new ResponseEntity<>(recipeService.save(recipe), HttpStatus.CREATED);
     }
-    @DeleteMapping("/{id}")
+    @PutMapping("/update")
+    public ResponseEntity<Recipe> update(@RequestBody Recipe recipe) throws IngredientNotFoundException, SQLIntegrityConstraintViolationException, MissingIngredientException {
+        return new ResponseEntity<>(recipeService.update(recipe), HttpStatus.CREATED);
+    }
+    @DeleteMapping("/id")
     public ResponseEntity<String> deleteById(@PathVariable Long id) throws RecipeNotFoundException {
 
             recipeService.deleteRecipeById(id);

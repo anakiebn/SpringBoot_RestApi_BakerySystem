@@ -21,7 +21,7 @@ import java.util.List;
 public class PaymentController {
     @Autowired
     private PaymentService paymentService;
-    @GetMapping("/{id}")
+    @GetMapping("/id")
     public ResponseEntity<Payment> findById(@PathVariable Long id) throws PaymentNotFoundException {
 
             return new ResponseEntity<>(paymentService.findById(id), HttpStatus.OK);
@@ -30,17 +30,19 @@ public class PaymentController {
 
     @GetMapping
     public ResponseEntity<List<Payment>> findAll() {
-
             return new ResponseEntity<>(paymentService.findAll(), HttpStatus.OK);
     }
 
-    @PostMapping
-    public ResponseEntity<Payment> save(@RequestBody PaymentDTO paymentDTO) throws OrderNotFoundException, UserNotFoundException, InsufficientFundsException, ProductNotFoundException, AccountNotFoundException, MessagingException {
-
+    @PostMapping("/save")
+    public ResponseEntity<Payment> save(@RequestBody PaymentDTO paymentDTO) throws OrderNotFoundException, UserNotFoundException, InsufficientFundsException, ProductNotFoundException, AccountNotFoundException, MessagingException{
             return new ResponseEntity<>(paymentService.save(paymentDTO), HttpStatus.CREATED);
     }
 
-    @DeleteMapping("/{id}")
+    @PostMapping("/update")
+    public ResponseEntity<Payment> update(@RequestBody PaymentDTO paymentDTO) throws OrderNotFoundException, UserNotFoundException, InsufficientFundsException, ProductNotFoundException, AccountNotFoundException, MessagingException {
+        return new ResponseEntity<>(paymentService.update(paymentDTO), HttpStatus.CREATED);
+    }
+    @DeleteMapping("/id")
     public ResponseEntity<String> deleteById(@PathVariable Long id) throws PaymentNotFoundException {
 
             paymentService.deleteById(id);

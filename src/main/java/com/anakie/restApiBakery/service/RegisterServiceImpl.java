@@ -16,7 +16,7 @@ public class RegisterServiceImpl implements RegisterService {
     private User user;
 
     @Override
-    public void sendCode() {
+    public void sendCode() throws DuplicateEmailException {
         emailService.registrationEmail(user.getEmail(), user.getUsername());
     }
 
@@ -28,6 +28,7 @@ public class RegisterServiceImpl implements RegisterService {
     @Override
     public User register(String providedCode) throws DuplicateEmailException {
         if(codesMatch(providedCode)){
+
             return userService.save(user);
         }
             return null;

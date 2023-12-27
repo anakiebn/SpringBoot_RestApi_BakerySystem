@@ -30,6 +30,7 @@ public class Order {
     @OneToMany(mappedBy = "order")
     private List<OrderStatusHistory> orderStatusHistories=new ArrayList<>();
 
+    @Column(scale = 2)
     private double totalPrice;
 
     @OneToOne(cascade = CascadeType.ALL)

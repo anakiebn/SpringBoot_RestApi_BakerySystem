@@ -27,7 +27,7 @@ public class RecipeServiceImpl implements RecipeService {
 
 
     @Override
-    public Recipe addRecipe(Recipe recipe) throws MissingIngredientException, IngredientNotFoundException, SQLIntegrityConstraintViolationException {
+    public Recipe save(Recipe recipe) throws MissingIngredientException, IngredientNotFoundException, SQLIntegrityConstraintViolationException {
 
         if(recipe.getRecipeIngredients()==null){
             throw new MissingIngredientException("Ingredients not found, Recipe must have ingredients!");
@@ -45,7 +45,7 @@ public class RecipeServiceImpl implements RecipeService {
     }
 
     @Override
-    public Recipe getRecipeById(Long id) throws RecipeNotFoundException {
+    public Recipe findById(Long id) throws RecipeNotFoundException {
         return recipeRepository.findById(id).orElseThrow(()-> new RecipeNotFoundException("Recipe id "+id+" not found!!!"));
     }
 
@@ -55,15 +55,15 @@ public class RecipeServiceImpl implements RecipeService {
     }
 
     @Override
-    public Recipe updateRecipe(Recipe recipe) throws RecipeNotFoundException, IngredientNotFoundException, SQLIntegrityConstraintViolationException, MissingIngredientException {
+    public Recipe update(Recipe recipe) throws RecipeNotFoundException, IngredientNotFoundException, SQLIntegrityConstraintViolationException, MissingIngredientException {
         if(!recipeRepository.existsById(recipe.getId())){
             throw new RecipeNotFoundException("Recipe not found, can't update recipe");
         }
-        return addRecipe(recipe);
+        return save(recipe);
     }
 
     @Override
-    public List<Recipe> getAllRecipes() {
+    public List<Recipe> findAll() {
         return recipeRepository.findAll();
     }
 

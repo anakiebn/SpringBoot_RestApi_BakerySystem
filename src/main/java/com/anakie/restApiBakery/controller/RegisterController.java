@@ -17,7 +17,7 @@ public class RegisterController {
     private RegisterService registerService;
 
     @PostMapping
-    public ResponseEntity<String> sendEmail(@RequestBody User user){
+    public ResponseEntity<String> sendEmail(@RequestBody User user) throws DuplicateEmailException {
         registerService.setUser(user);
         registerService.sendCode();
         return new ResponseEntity<>("Email successfully sent to "+user.getEmail(), HttpStatus.CREATED);

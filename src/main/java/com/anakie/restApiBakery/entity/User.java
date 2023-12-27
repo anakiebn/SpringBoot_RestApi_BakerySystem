@@ -25,18 +25,24 @@ public class User {
     @Column(nullable = false,length = 50)
     private String username;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     private Role role=Role.CUSTOMER_ROLE;
+
+    private String password;
 
     @Column(nullable = false,length = 50,unique = true)
     private String email;
 
-    private LocalDate dob;
+    private LocalDate dob; // date of birth
 
     @JsonIgnore
     @OneToMany(mappedBy = "user")
     private List<Order> orders;
 
+    private boolean isActive; // checks if they are active/ not
+
+    @Builder.Default
     @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(
             name= "user_address",

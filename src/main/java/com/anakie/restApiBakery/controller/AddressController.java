@@ -16,27 +16,27 @@ public class AddressController {
     @Autowired
     private AddressService addressService;
 
-    @GetMapping("/{id}")
+    @GetMapping("/id")
     public ResponseEntity<Address> findById(@PathVariable Long id) throws AddressNotFoundException {
 
             log.info("Getting address by ID: {}", id);
             return new ResponseEntity<>(addressService.findById(id), HttpStatus.OK);
     }
 
-    @PostMapping
+    @PostMapping("/save")
     public ResponseEntity<Address> save(@RequestBody Address address) {
         log.info("Adding address");
         Address addedAddress = addressService.save(address);
         return new ResponseEntity<>(addedAddress, HttpStatus.CREATED);
     }
 
-    @PutMapping
+    @PutMapping("/update")
     public ResponseEntity<Address> update(@RequestBody Address address) throws AddressNotFoundException {
 
             return new ResponseEntity<>(addressService.update(address), HttpStatus.ACCEPTED);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/id")
     public ResponseEntity<String> deleteById(@PathVariable Long id) throws AddressNotFoundException {
             addressService.deleteById(id);
             return new ResponseEntity<>("Address id: "+id+", successfully deleted ", HttpStatus.OK);

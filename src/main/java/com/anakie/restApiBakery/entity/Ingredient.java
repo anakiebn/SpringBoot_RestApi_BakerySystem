@@ -23,11 +23,15 @@ public class Ingredient {
     @Enumerated(EnumType.STRING)
     private Unit unit; // if it's a litre
 
-    @Column(length = 50,unique = true)
+
+    @Column(length = 50,unique = true,nullable = false)
     private String name; // and the name is milk
 
     @Column(scale=3) //maximum decimal point of 2
     private double quantity; //  then the quantity is like saying I have 2 litre of milk
+
+    @Column(scale=3) // maximum decimal point of 2
+    private double minQuantity; //  the lowest quantity an ingredient can have before it's declared outOfStock
 
     @Override
     public final boolean equals(Object o) {

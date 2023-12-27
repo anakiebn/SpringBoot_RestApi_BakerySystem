@@ -16,6 +16,9 @@ public class AddressServiceImpl implements AddressService {
 
     @Override
     public Address save(Address address) {
+        if(address==null){
+            throw new NullPointerException("Null address not allowed, provide none-null object");
+        }
         return addressRepository.save(address);
     }
 

@@ -1,6 +1,7 @@
 package com.anakie.restApiBakery.service;
 
 import com.anakie.restApiBakery.entity.Ingredient;
+import com.anakie.restApiBakery.entity.IngredientMinQty;
 import com.anakie.restApiBakery.entity.RecipeIngredient;
 import com.anakie.restApiBakery.exception.IngredientNotFoundException;
 import com.anakie.restApiBakery.exception.OutOfStockException;
@@ -20,4 +21,6 @@ public interface IngredientService {
     boolean stockAvailable(RecipeIngredient recipeIngredient, int quantity) throws IngredientNotFoundException;
 
     void useIngredient(RecipeIngredient recipeIngr, int proQty) throws IngredientNotFoundException, OutOfStockException;
+
+    List<IngredientMinQty> save(List<IngredientMinQty> ingredientMinQuantities);
 }

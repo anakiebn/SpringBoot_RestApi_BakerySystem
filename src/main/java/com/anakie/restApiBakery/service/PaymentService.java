@@ -2,6 +2,7 @@ package com.anakie.restApiBakery.service;
 
 import com.anakie.restApiBakery.entity.Payment;
 import com.anakie.restApiBakery.entity.PaymentDTO;
+import com.anakie.restApiBakery.entity.Status;
 import com.anakie.restApiBakery.exception.*;
 import jakarta.mail.MessagingException;
 
@@ -13,7 +14,9 @@ public interface PaymentService {
 
     void deleteById(Long id) throws PaymentNotFoundException;
 
-    Payment update(Payment payments) throws PaymentNotFoundException;
+    Payment update(PaymentDTO paymentsDTO) throws PaymentNotFoundException;
 
     List<Payment> findAll();
+
+    Payment changePaymentStatus(Payment payment, Status status);
 }

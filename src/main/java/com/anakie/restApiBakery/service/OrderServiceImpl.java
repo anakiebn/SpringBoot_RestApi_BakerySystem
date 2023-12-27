@@ -33,18 +33,27 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Order save(OrderDTO orderDTO) throws Exception {
-        Order order = orderDTO.toOrder(userService);
-        ShoppingCart shoppingCart = shoppingCartService.save(order.getShoppingCart());
-        order.setShoppingCart(shoppingCart);
+        if (orderDTO == null) {
+            throw new NullPointerException("Null order not allowed, provide none-null object");
+        }
 
+        Order order = orderDTO.toOrder(userService);
+        order.setShoppingCart(shoppingCartService.save(order.getShoppingCart()));
         order.setTotalPrice(calculateTotal(order)); // set the total price of the order
-        OrderStatusHistory orderStatusHistory = new OrderStatusHistory();
-        orderStatusHistory.setStatus(Status.Pending); // new orders are given this status
-        orderStatusHistory.setOrder(order=orderRepository.save(order)); // save order to get its ID so the status can reference it
-        orderStatusHistoryRepository.save(orderStatusHistory);
+        changeOrderStatus(order = orderRepository.save(order),Status.Processing);
         return order;
     }
-    public double calculateTotal(Order order) throws ProductNotFoundException {
+
+    @Override
+    public void changeOrderStatus(Order order, Status status) {
+        OrderStatusHistory orderStatusHistory = new OrderStatusHistory();
+        orderStatusHistory.setOrder(order);
+        orderStatusHistory.setDateTime(LocalDateTime.now());
+        orderStatusHistory.setStatus(status);
+        orderStatusHistoryRepository.save(orderStatusHistory);
+    }
+
+    private double calculateTotal(Order order) throws ProductNotFoundException {
         double totalPrice = 0;
         for (CartItem cartItem : order.getShoppingCart().getCartItems()) {
             totalPrice += productService.totalAmount(cartItem.getProductId(), cartItem.getProductQty());
@@ -53,15 +62,16 @@ public class OrderServiceImpl implements OrderService {
     }
 
 
-      // once an order is made, we bake, when we bake we use ingredients, meaning, we subtract
-     //  all used ingredients according to their recipe
-    public void bakeProducts(Order order) {
+    // once an order is made, we bake, when we bake we use ingredients, meaning, we subtract
+    // all used ingredients according to the recipe
+    public void bakeProducts(Order order) throws OutOfStockException {
         order.getShoppingCart().getCartItems().forEach(cartItem -> {
-            try {
-                useIngredients(cartItem);
-            } catch (ProductNotFoundException | IngredientNotFoundException | OutOfStockException e) {
-                throw new RuntimeException(e);
-            }
+
+                Product product = productService.findById(cartItem.getProductId());
+                for (RecipeIngredient recipeIngredient : product.getRecipe().getRecipeIngredients()) {
+                    // this method is the one that does the magic o reducing ingredients
+                    ingredientService.useIngredient(recipeIngredient, cartItem.getProductQty());
+                }
         });
     }
 
@@ -85,13 +95,6 @@ public class OrderServiceImpl implements OrderService {
             throw new OrderNotFoundException("Can't update order " + order.getId() + " not found, use an existing id!");
         }
         return orderRepository.save(order);
-    }
-
-    private void useIngredients(CartItem cartItem) throws ProductNotFoundException, IngredientNotFoundException, OutOfStockException {
-        Product product = productService.findById(cartItem.getProductId());
-        for (RecipeIngredient recipeIngredient : product.getRecipe().getRecipeIngredients()) {
-            ingredientService.useIngredient(recipeIngredient, cartItem.getProductQty());
-        }
     }
 
     public boolean existsById(Long id) {

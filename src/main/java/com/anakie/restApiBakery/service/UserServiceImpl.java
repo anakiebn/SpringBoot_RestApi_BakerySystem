@@ -7,11 +7,12 @@ import com.anakie.restApiBakery.repository.AccountStatusHistoryRepository;
 import com.anakie.restApiBakery.repository.AddressRepository;
 import com.anakie.restApiBakery.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.security.SecureRandom;
 import java.util.List;
 
 @Slf4j
@@ -30,29 +31,27 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public User save(User tempUser) throws DuplicateEmailException {
-        String email = tempUser.getEmail();
-        if (userRepository.findAll().stream().anyMatch((eachUser) -> eachUser.getEmail().equalsIgnoreCase(email))) {
-            throw new DuplicateEmailException("Duplicate email: " + tempUser.getEmail() + " , Already exists, log in  or use another email");
-        }
-        // when ever we create a new user, the system automatically creates a new account for them
-        saveUserAccount(userRepository.save(tempUser));
-        return tempUser;
+    public User save(User user) throws DuplicateEmailException {
 
+        if(user==null){
+            throw new NullPointerException("Null user not allowed, provide none-null object");
+        }
+        if (userRepository.findAll().stream().anyMatch((eachUser) -> eachUser.getEmail().equalsIgnoreCase(user.getEmail()))) {
+            throw new DuplicateEmailException("Duplicate email: " + user.getEmail() + " , Already exists, log in  or use another email");
+        }
+
+        user.setPassword(BCrypt.hashpw(user.getPassword(),BCrypt.gensalt(10,new SecureRandom()))); // encrypt password
+        return saveUserAccount(userRepository.save(user)); // when ever we create new users, the system automatically creates a new account for them
     }
 
-    private void saveUserAccount(User user) {
-
+    private User saveUserAccount(User user){
+        user.setActive(true); // all new users must be set to active
         Account account = new Account();
         account.setAmount(0); // by default, they will have R 0.00 balance
         account.setUser(user);
-        AccountStatusHistory accountStatusHistory = new AccountStatusHistory();
-        accountStatusHistory.setStatus(Status.Active); // new status of this account
-        accountStatusHistory.setDateTime(LocalDateTime.now());
-        account.getAccountStatusHistories().add(accountStatusHistory);
-        accountStatusHistory.setAccount(accountService.save(account));
-        accountStatusHistoryRepository.save(accountStatusHistory);
-
+        ; // link db account to the present account to get its id
+        accountService.changeAccountStatus(account=accountService.save(account),Status.New);
+        return user;
     }
 
     @Override
@@ -68,10 +67,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User update(User user) throws UserNotFoundException {
-        if (!userRepository.existsById(user.getId())) {
-            throw new UserNotFoundException("Failed to delete, user " + user.getId() + " not found!");
+        if (userRepository.existsById(user.getId())) {
+            userRepository.save(user);
         }
-        return userRepository.save(user);
+        throw new UserNotFoundException("Failed to update, user " + user.getId() + " not found!");
+
+
     }
 
     @Override
@@ -88,6 +89,20 @@ public class UserServiceImpl implements UserService {
         );
         user.getAddressList().add(addressRepository.save(address));
         return userRepository.save(user);
+    }
+
+    @Override
+    public List<User> findAllActiveUsers(){
+        return userRepository.findAll().stream().filter(User::isActive).toList();
+    }
+
+    @Override
+    public List<User> findAllNoneActiveUsers(){
+        return userRepository.findAll().stream().filter(user->!user.isActive()).toList();
+    }
+    @Override
+    public boolean existsByEmail(String email) {
+        return userRepository.existsByEmail(email);
     }
 
     @Override

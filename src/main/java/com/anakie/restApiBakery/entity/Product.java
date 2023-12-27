@@ -1,17 +1,15 @@
 package com.anakie.restApiBakery.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
 
 import java.util.Objects;
-
 @Entity
 @Getter
 @Setter
-@RequiredArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
 public class Product {
 
     @Id
@@ -27,7 +25,8 @@ public class Product {
 
     private double weight;
 
-    private Unit unit=Unit.NO_UNIT;
+    @Enumerated(EnumType.STRING)
+    private Unit unit;
 
     @ManyToOne(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     @JoinColumn(name ="category_id")
@@ -35,7 +34,7 @@ public class Product {
 
     private String image;
 
-    @Column(scale=3,nullable = false)
+    @Column( scale = 2)
     private double price;
 
     @Column(length = 200)

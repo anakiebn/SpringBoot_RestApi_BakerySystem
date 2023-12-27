@@ -18,7 +18,7 @@ public class CategoryController {
 
     @Autowired
     private CategoryService categoryService;
-    @GetMapping("/{id}")
+    @GetMapping("/id")
     public ResponseEntity<Category> findById(@PathVariable Long id) throws CategoryNotFoundException {
             return new ResponseEntity<>(categoryService.findById(id), HttpStatus.OK);
     }
@@ -27,13 +27,15 @@ public class CategoryController {
 
             return new ResponseEntity<>(categoryService.findAll(), HttpStatus.OK);
     }
-    @PostMapping
+    @PostMapping("/save")
     public ResponseEntity<Category> save(@RequestBody Category category){
-
             return new ResponseEntity<>(categoryService.save(category), HttpStatus.OK);
-
     }
-    @DeleteMapping("/{id}")
+    @PutMapping("/update")
+    public ResponseEntity<Category> update(@RequestBody Category category){
+        return new ResponseEntity<>(categoryService.update(category), HttpStatus.OK);
+    }
+    @DeleteMapping("/id")
     public ResponseEntity<String> deleteById(@PathVariable Long id) throws CategoryNotFoundException {
         categoryService.deleteById(id);
             return new ResponseEntity<>("Category id: "+id+" successfully removed", HttpStatus.GONE);

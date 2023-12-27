@@ -21,27 +21,26 @@ public class OrderController {
     @Autowired
     private OrderService orderService;
 
-    @GetMapping("/{id}")
+    @GetMapping("/id")
     public ResponseEntity<Order> findById(@PathVariable Long id) throws OrderNotFoundException {
-
             return new ResponseEntity<>(orderService.findById(id), HttpStatus.OK);
-
     }
 
     @GetMapping
     public ResponseEntity<List<Order>> findAll() {
-
             return new ResponseEntity<>(orderService.findAll(), HttpStatus.OK);
-
     }
 
-    @PostMapping
+    @PostMapping("/save")
     public ResponseEntity<Order> save(@RequestBody OrderDTO orderDTO) throws Exception {
-
             return new ResponseEntity<>(orderService.save(orderDTO), HttpStatus.CREATED);
     }
+    @PutMapping("/update")
+    public ResponseEntity<Order> update(@RequestBody OrderDTO orderDTO) throws Exception {
+        return new ResponseEntity<>(orderService.save(orderDTO), HttpStatus.CREATED);
+    }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/id")
     public ResponseEntity<String> deleteById(@PathVariable Long id) throws OrderNotFoundException {
 
             orderService.deleteById(id);

@@ -23,6 +23,10 @@ public class ProductDTO {
 
     private double price;
 
+    private double weight;
+
+    private Unit unit;
+
     private String nutrientInfo;
 
     private String description;
@@ -33,7 +37,7 @@ public class ProductDTO {
 
         Product product = new Product();
         product.setName(this.name);
-        product.setRecipe(recipeService.getRecipeById(this.recipeId));
+        product.setRecipe(recipeService.findById(this.recipeId));
         product.setCategory(categoryService.findById(this.categoryId));
         product.setDescription(this.description);
         product.setPrice(this.price);

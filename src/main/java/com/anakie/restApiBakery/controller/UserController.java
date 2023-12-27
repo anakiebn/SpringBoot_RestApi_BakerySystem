@@ -31,18 +31,32 @@ public class UserController {
         return new ResponseEntity<>(userService.findAll(), HttpStatus.OK);
     }
 
-    @PostMapping
+    @GetMapping("/activeUsers")
+    public ResponseEntity<List<User>> findAllActiveUsers() {
+        return new ResponseEntity<>(userService.findAllActiveUsers(), HttpStatus.OK);
+    }
+    @GetMapping("/noneActiveUsers")
+    public ResponseEntity<List<User>> findAllNoneActiveUsers() {
+        return new ResponseEntity<>(userService.findAllNoneActiveUsers(), HttpStatus.OK);
+    }
+
+
+    @PostMapping("/save")
     public ResponseEntity<User> save(@RequestBody User user) throws DuplicateEmailException {
             return new ResponseEntity<>(userService.save(user), HttpStatus.CREATED);
     }
+    @PutMapping("/update")
+    public ResponseEntity<User> update(@RequestBody User user) throws DuplicateEmailException {
+        return new ResponseEntity<>(userService.update(user), HttpStatus.CREATED);
+    }
 
-    @PostMapping("/address/{id}")
+    @PostMapping("/address/id")
     public ResponseEntity<User> saveAddress(@RequestBody Address address, @PathVariable Long id) throws Exception {
             return new ResponseEntity<>(userService.saveAddress(address, id), HttpStatus.CREATED);
     }
 
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/id")
     public ResponseEntity<String> deleteById(@PathVariable Long id) throws UserNotFoundException {
 
             userService.deleteById(id);

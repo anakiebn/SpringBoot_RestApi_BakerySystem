@@ -25,7 +25,7 @@ public class Payment {
     @OneToMany(mappedBy = "payment")
     private List<PaymentStatusHistory> paymentStatusHistories=new ArrayList<>();
 
-    @Column(scale = 3)
+    @Column( scale = 2)
     private double amount;
 
     @Enumerated(EnumType.STRING)

@@ -19,5 +19,10 @@ public interface UserService {
     List<User> findAll();
     User saveAddress(Address address, Long userId) throws UserNotFoundException, Exception;
 
+    List<User> findAllActiveUsers();
+
+    List<User> findAllNoneActiveUsers();
+
+    boolean existsByEmail(String email);
     boolean existsById(Long id);
 }

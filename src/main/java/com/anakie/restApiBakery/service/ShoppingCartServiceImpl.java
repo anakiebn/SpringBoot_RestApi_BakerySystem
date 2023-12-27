@@ -27,7 +27,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class ShoppingCartServiceImpl implements ShoppingCartService {
 
-
+    // this cart simply holds what we have at the moment
     private final Map<Long, Integer> cart = new HashMap<>();
 
     @Autowired
@@ -46,33 +46,28 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
         Product product = productService.findById(productId);
         boolean available = true;
-        int qty = productQty;
+        int qty = productQty; //get product quantity
 
         if (cart.containsKey(productId)) {
             qty = cart.get(productId) + productQty; // if it exists already we add the quantity
         }
 
         for (RecipeIngredient ingredient : product.getRecipe().getRecipeIngredients()) {
-            try {
-                if (!ingredientService.stockAvailable(ingredient, qty)) {
-                    available = false;
-                    break;
-                }
-            } catch (IngredientNotFoundException e) {
-                log.error(e.getMessage());
+
+            if (!ingredientService.existsById(ingredient.getId())) {
+                log.info("On addProduct() method an exception was thrown");
+                throw new IngredientNotFoundException("Ingredient not found, provide valid ingredients");
+            }
+            if (!ingredientService.stockAvailable(ingredient, qty)) {
+                throw new OutOfStockException("Can't add product to cart, we don't have enough ingredients");
             }
         }
-
-        //if we have enough stock, we add the products to our cart
-        if (available) {
-            if (cart.containsKey(productId)) {
-                return cart.replace(productId, cart.get(productId), qty);
-            } else {
-                cart.put(productId, qty);
-                return cart.containsKey(productId);
-            }
+        // this code is only reached when no outOfStockException/Ingredient was thrown
+        if (cart.containsKey(productId)) {
+            return cart.replace(productId, cart.get(productId), qty);
         } else {
-            throw new OutOfStockException("Can't add product to cart, we don't have enough ingredients");
+            cart.put(productId, qty);
+            return cart.containsKey(productId);
         }
 
     }
@@ -87,8 +82,10 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         int currentProductQty = cart.get(productId); // get its quantity from the cart
 
         if (cart.containsKey(productId)) { //check if we have it in the cart
-            if (currentProductQty >= productQty) { // if the quantity is valid
-                if (currentProductQty == productQty) { // if they are equal, we remove the product from the cart
+            if (currentProductQty >= productQty) { // if the quantity is valid, we don't want them subtracting 5 items when we only have 2 of that kind
+                // suppose quantities are equal, we remove the product from the cart e.g. if you reduce 2 products from a cart where you have only 2 of that kind,
+                // that means that you won't be left with any kind of that product cause you took out all of them.
+                if (currentProductQty == productQty) {
                     cart.remove(productId);
                     return !cart.containsKey(productId);
                 } else {
@@ -105,21 +102,26 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
     @Override
     public ShoppingCart save(ShoppingCart shoppingCart) throws Exception {
-
+        // we add products to our cart
         for (CartItem cartItem : shoppingCart.getCartItems()) {
-            Product product = productService.findById(cartItem.getProductId());
-            int productQty = cartItem.getProductQty();
-            if (!addProduct(product.getId(), productQty)) {
+            if (!addProduct(cartItem.getProductId(), cartItem.getProductQty())) { // this method adds products to our cart only if we have enough stock
                 throw new Exception("Error occurred while adding products to cart");
             }
         }
-        // update shoppingCart
-        shoppingCart = shoppingCartRepository.save(shoppingCart);
-        // insert items
-        for (CartItem cartItem : shoppingCart.getCartItems()) {
+
+        List<CartItem> distinctShoppingCart = new ArrayList<>();
+        for (Long productId : cart.keySet()) {  // converting our map cart to arraylist
+            distinctShoppingCart.add(new CartItem(productId, cart.get(productId)));
+        }
+        shoppingCart.setCartItems(distinctShoppingCart); // update the shopping cart
+        shoppingCart=shoppingCartRepository.save(shoppingCart); // add to db to get its id
+
+        // link each cartItem to a shopping cart
+        for(CartItem cartItem:distinctShoppingCart){
             cartItem.setShoppingCart(shoppingCart);
             cartItemRepository.save(cartItem);
         }
+
         return shoppingCart;
     }
 

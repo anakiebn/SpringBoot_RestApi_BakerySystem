@@ -20,7 +20,8 @@ public class AccountController {
     @Autowired
     private AccountService accountService;
 
-    @GetMapping("/{id}")
+    // CRUD
+    @GetMapping("/id")
     public ResponseEntity<Account> findById(@PathVariable("id") Long id) throws AccountNotFoundException {
             return new ResponseEntity<>(accountService.findById(id), HttpStatus.OK);
     }
@@ -30,12 +31,16 @@ public class AccountController {
         return new ResponseEntity<>(accountService.findAll(), HttpStatus.OK);
     }
 
-    @PostMapping
+    @PostMapping("/save")
     public ResponseEntity<Account> save(@RequestBody Account account) {
             return new ResponseEntity<>(accountService.save(account), HttpStatus.CREATED);
     }
 
-    @DeleteMapping("/{id}")
+    @PutMapping("/update")
+    public ResponseEntity<Account> update(@RequestBody Account account) {
+        return new ResponseEntity<>(accountService.update(account), HttpStatus.CREATED);
+    }
+    @DeleteMapping("/id")
     public ResponseEntity<String> deleteById(@PathVariable Long id) throws AccountNotFoundException {
             accountService.deleteById(id);
             return new ResponseEntity<>("Account "+id+" successfully deleted", HttpStatus.GONE);
