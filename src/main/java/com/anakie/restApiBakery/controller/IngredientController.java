@@ -23,7 +23,7 @@ public class IngredientController {
 
     @Autowired
     private final IngredientService ingredientService;
-    @GetMapping("/id")
+    @GetMapping("/find/{id}")
     public ResponseEntity<Ingredient> findById(@PathVariable Long id) throws IngredientNotFoundException {
         return new ResponseEntity<>(ingredientService.findById(id), HttpStatus.OK);
     }
@@ -41,7 +41,7 @@ public class IngredientController {
     public ResponseEntity<Ingredient> update(@RequestBody Ingredient ingredient){
         return new ResponseEntity<>(ingredientService.update(ingredient), HttpStatus.OK);
     }
-    @DeleteMapping("/id")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteById(@PathVariable Long id) throws IngredientNotFoundException {
             ingredientService.deleteById(id);
             return new ResponseEntity<>("Ingredient id: "+id+" successfully removed", HttpStatus.GONE);

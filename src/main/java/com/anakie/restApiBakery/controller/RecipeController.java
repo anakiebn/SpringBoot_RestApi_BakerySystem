@@ -26,7 +26,7 @@ public class RecipeController {
     @Autowired
     private final RecipeService recipeService;
 
-    @GetMapping("/id")
+    @GetMapping("/find/{id}")
     public ResponseEntity<Recipe> findById(@PathVariable Long id) throws RecipeNotFoundException {
             return new ResponseEntity<>(recipeService.findById(id), HttpStatus.OK);
 
@@ -44,7 +44,7 @@ public class RecipeController {
     public ResponseEntity<Recipe> update(@RequestBody RecipeDTO recipeDTO) throws IngredientNotFoundException, SQLIntegrityConstraintViolationException, MissingIngredientException {
         return new ResponseEntity<>(recipeService.update(recipeDTO), HttpStatus.CREATED);
     }
-    @DeleteMapping("/id")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteById(@PathVariable Long id) throws RecipeNotFoundException {
 
             recipeService.deleteRecipeById(id);

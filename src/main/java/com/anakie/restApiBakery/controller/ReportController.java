@@ -4,6 +4,7 @@ package com.anakie.restApiBakery.controller;
 import com.anakie.restApiBakery.entity.Ingredient;
 import com.anakie.restApiBakery.entity.Order;
 import com.anakie.restApiBakery.service.ReportService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,10 +16,11 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/reports")
+@RequiredArgsConstructor
 public class ReportController {
 
     @Autowired
-    private ReportService reportService;
+    private final ReportService reportService;
 
     @GetMapping("/ordersPlaced")
     public ResponseEntity<List<Order>> ordersPlaced(@RequestBody List<LocalDate> dates){

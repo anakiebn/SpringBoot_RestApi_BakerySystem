@@ -5,6 +5,7 @@ import com.anakie.restApiBakery.entity.User;
 import com.anakie.restApiBakery.exception.DuplicateEmailException;
 import com.anakie.restApiBakery.exception.UserNotFoundException;
 import com.anakie.restApiBakery.service.UserService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,13 +17,14 @@ import java.util.List;
 @RestController
 @Slf4j
 @RequestMapping("/api/v1/users")
+@RequiredArgsConstructor
 public class UserController {
 
     @Autowired
-    private UserService userService;
+    private final UserService userService;
 
-    @GetMapping("/{id}")
-    public ResponseEntity<User> findById(@PathVariable("id") Long id) throws UserNotFoundException {
+    @GetMapping("/find/{id}")
+    public ResponseEntity<User> findById(@PathVariable Long id) throws UserNotFoundException {
             return new ResponseEntity<>(userService.findById(id), HttpStatus.OK);
     }
 
@@ -56,7 +58,7 @@ public class UserController {
     }
 
 
-    @DeleteMapping("/id")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteById(@PathVariable Long id) throws UserNotFoundException {
 
             userService.deleteById(id);

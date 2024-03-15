@@ -6,8 +6,8 @@ import com.anakie.restApiBakery.exception.CategoryNotFoundException;
 import com.anakie.restApiBakery.exception.ProductNotFoundException;
 import com.anakie.restApiBakery.exception.RecipeNotFoundException;
 import com.anakie.restApiBakery.service.ProductService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.PropertyValueException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,11 +18,12 @@ import java.util.List;
 @RestController
 @Slf4j
 @RequestMapping("/api/v1/products")
+@RequiredArgsConstructor
 public class ProductController {
 
     @Autowired
-    private ProductService productService;
-    @GetMapping("/id")
+    private final ProductService productService;
+    @GetMapping("/find/{id}")
     public ResponseEntity<Product> findById(@PathVariable Long id) throws ProductNotFoundException {
 
             return new ResponseEntity<>(productService.findById(id), HttpStatus.OK);
@@ -40,7 +41,7 @@ public class ProductController {
     public ResponseEntity<Product> update(@RequestBody ProductDTO productDTO) throws RecipeNotFoundException, CategoryNotFoundException {
         return new ResponseEntity<>(productService.update(productDTO), HttpStatus.OK);
     }
-    @DeleteMapping("/id")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteById(@PathVariable Long id) throws ProductNotFoundException {
 
             productService.deleteById(id);

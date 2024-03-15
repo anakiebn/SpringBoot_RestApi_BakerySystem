@@ -4,6 +4,7 @@ import com.anakie.restApiBakery.entity.Order;
 import com.anakie.restApiBakery.entity.OrderDTO;
 import com.anakie.restApiBakery.exception.OrderNotFoundException;
 import com.anakie.restApiBakery.service.OrderService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,13 +16,14 @@ import java.util.List;
 @RestController
 @RequestMapping("api/v1/orders")
 @Slf4j
+@RequiredArgsConstructor
 public class OrderController {
 
 
     @Autowired
-    private OrderService orderService;
+    private final OrderService orderService;
 
-    @GetMapping("/id")
+    @GetMapping("/find/{id}")
     public ResponseEntity<Order> findById(@PathVariable Long id) throws OrderNotFoundException {
             return new ResponseEntity<>(orderService.findById(id), HttpStatus.OK);
     }
@@ -40,7 +42,7 @@ public class OrderController {
         return new ResponseEntity<>(orderService.save(orderDTO), HttpStatus.CREATED);
     }
 
-    @DeleteMapping("/id")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteById(@PathVariable Long id) throws OrderNotFoundException {
 
             orderService.deleteById(id);

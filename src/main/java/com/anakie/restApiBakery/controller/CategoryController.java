@@ -3,6 +3,7 @@ package com.anakie.restApiBakery.controller;
 import com.anakie.restApiBakery.entity.Category;
 import com.anakie.restApiBakery.exception.CategoryNotFoundException;
 import com.anakie.restApiBakery.service.CategoryService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,11 +15,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/categories")
 @Slf4j
+@RequiredArgsConstructor
 public class CategoryController {
 
     @Autowired
-    private CategoryService categoryService;
-    @GetMapping("/id")
+    private final CategoryService categoryService;
+    @GetMapping("/find/{id}")
     public ResponseEntity<Category> findById(@PathVariable Long id) throws CategoryNotFoundException {
             return new ResponseEntity<>(categoryService.findById(id), HttpStatus.OK);
     }
@@ -35,7 +37,7 @@ public class CategoryController {
     public ResponseEntity<Category> update(@RequestBody Category category){
         return new ResponseEntity<>(categoryService.update(category), HttpStatus.OK);
     }
-    @DeleteMapping("/id")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteById(@PathVariable Long id) throws CategoryNotFoundException {
         categoryService.deleteById(id);
             return new ResponseEntity<>("Category id: "+id+" successfully removed", HttpStatus.GONE);
