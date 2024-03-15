@@ -5,10 +5,10 @@ import com.anakie.restApiBakery.exception.DuplicateEmailException;
 
 public interface RegisterService {
 
-    public void sendCode() throws DuplicateEmailException;
-    public boolean codesMatch(String providedCode);
-    public User register(String providedCode) throws DuplicateEmailException;
-    public void setUser(User user);
+    void sendCode() throws DuplicateEmailException;
+    boolean codesMatch(String providedCode);
+    User register(String providedCode) throws DuplicateEmailException;
+    void setUser(User user);
 
 
 }

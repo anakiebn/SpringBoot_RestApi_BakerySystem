@@ -18,5 +18,4 @@ public interface PaymentService {
 
     List<Payment> findAll();
 
-    Payment changePaymentStatus(Payment payment, Status status);
 }

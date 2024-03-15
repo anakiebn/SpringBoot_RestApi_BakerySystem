@@ -1,8 +1,8 @@
 package com.anakie.restApiBakery.service;
 
 import com.anakie.restApiBakery.entity.CartItem;
+import com.anakie.restApiBakery.entity.Ingredient;
 import com.anakie.restApiBakery.entity.Product;
-import com.anakie.restApiBakery.entity.RecipeIngredient;
 import com.anakie.restApiBakery.entity.ShoppingCart;
 import com.anakie.restApiBakery.exception.*;
 import com.anakie.restApiBakery.repository.CartItemRepository;
@@ -14,16 +14,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 @Service
 @Slf4j
-@Getter
-@Setter
 @RequiredArgsConstructor
 public class ShoppingCartServiceImpl implements ShoppingCartService {
 
@@ -31,42 +26,34 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     private final Map<Long, Integer> cart = new HashMap<>();
 
     @Autowired
-    private ProductService productService;
+    private final ProductService productService;
     @Autowired
-    private IngredientService ingredientService;
+    private final IngredientService ingredientService;
 
     @Autowired
-    private ShoppingCartRepository shoppingCartRepository;
+    private final ShoppingCartRepository shoppingCartRepository;
 
     @Autowired
-    private CartItemRepository cartItemRepository;
+    private final CartItemRepository cartItemRepository;
 
 
     public boolean addProduct(Long productId, int productQty) throws OutOfStockException, ProductNotFoundException {
 
         Product product = productService.findById(productId);
-        boolean available = true;
-        int qty = productQty; //get product quantity
 
-        if (cart.containsKey(productId)) {
-            qty = cart.get(productId) + productQty; // if it exists already we add the quantity
+        Map<Long, Double> recipeIngr = product.getRecipe().toRecipeIngrId();
+
+        for (Long recipeIngrId : recipeIngr.keySet()) {
+            //since we're just adding to a cart, we must first check if we have enough stock
+            ingredientService.confirmStockAvailability(recipeIngrId, recipeIngr.get(recipeIngrId), productQty);
         }
 
-        for (RecipeIngredient ingredient : product.getRecipe().getRecipeIngredients()) {
+        // if we reach here, means that we have enough stock
 
-            if (!ingredientService.existsById(ingredient.getId())) {
-                log.info("On addProduct() method an exception was thrown");
-                throw new IngredientNotFoundException("Ingredient not found, provide valid ingredients");
-            }
-            if (!ingredientService.stockAvailable(ingredient, qty)) {
-                throw new OutOfStockException("Can't add product to cart, we don't have enough ingredients");
-            }
-        }
-        // this code is only reached when no outOfStockException/Ingredient was thrown
         if (cart.containsKey(productId)) {
-            return cart.replace(productId, cart.get(productId), qty);
+            return cart.replace(productId, cart.get(productId), cart.get(productId) + productQty);
         } else {
-            cart.put(productId, qty);
+            cart.put(productId, productQty);
             return cart.containsKey(productId);
         }
 
@@ -75,29 +62,27 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
     @Override
     public boolean removeProduct(Long productId, int productQty) throws ProductNotFoundException, InvalidProductQuantity {
-
-        if (productService.existsById(productId)) {
-            throw new ProductNotFoundException("Product id " + productId + "not found");
+        // if we're trying to remove a product that doesn't exist in a cart, we throw
+        if (!cart.containsKey(productId)) {
+            throw new ProductNotFoundException("Product not available in the cart");
         }
-        int currentProductQty = cart.get(productId); // get its quantity from the cart
+        Product product = productService.findById(productId);
 
-        if (cart.containsKey(productId)) { //check if we have it in the cart
-            if (currentProductQty >= productQty) { // if the quantity is valid, we don't want them subtracting 5 items when we only have 2 of that kind
-                // suppose quantities are equal, we remove the product from the cart e.g. if you reduce 2 products from a cart where you have only 2 of that kind,
-                // that means that you won't be left with any kind of that product cause you took out all of them.
-                if (currentProductQty == productQty) {
-                    cart.remove(productId);
-                    return !cart.containsKey(productId);
-                } else {
-                    // or we can just reduce the quantity instead
-                    return cart.replace(productId, currentProductQty, currentProductQty - productQty);
-                }
-            } else {
-                //if the quantity is bigger than the available one, we throw an invalid quantity exception
-                throw new InvalidProductQuantity("Provided quantity of product " + productId + " is larger than the available quantity on the cart");
-            }
+        Map<Long, Double> recipeIngr = product.getRecipe().toRecipeIngrId();
+
+        for (Long recipeIngrId : recipeIngr.keySet()) {
+            // since we're removing a product from a cart, then we must return ingredients to the db copy we just had.
+            ingredientService.returnIngrToCopy(recipeIngrId, recipeIngr.get(recipeIngrId), productQty);
         }
-        throw new ProductNotFoundException("Product not present in shopping cart");
+
+        int productCurrentQtyInCart = cart.get(productId); // query products quantity in the cart
+
+        if (productCurrentQtyInCart > 0) {
+            return cart.replace(productId, cart.get(productId), productCurrentQtyInCart);
+        } else {
+            return Objects.equals(cart.get(productId), cart.remove(productId));
+        }
+
     }
 
     @Override
@@ -114,10 +99,10 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
             distinctShoppingCart.add(new CartItem(productId, cart.get(productId)));
         }
         shoppingCart.setCartItems(distinctShoppingCart); // update the shopping cart
-        shoppingCart=shoppingCartRepository.save(shoppingCart); // add to db to get its id
+        shoppingCart = shoppingCartRepository.save(shoppingCart); // add to db to get its id
 
         // link each cartItem to a shopping cart
-        for(CartItem cartItem:distinctShoppingCart){
+        for (CartItem cartItem : distinctShoppingCart) {
             cartItem.setShoppingCart(shoppingCart);
             cartItemRepository.save(cartItem);
         }
@@ -158,7 +143,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     }
 
     @Override
-    public boolean cartValid(ShoppingCart shoppingCart) throws ShoppingCartNotFoundException, CartEmptyException, ProductNotFoundException {
+    public boolean validateCart(ShoppingCart shoppingCart) throws ShoppingCartNotFoundException, CartEmptyException, ProductNotFoundException {
         if (shoppingCart == null) {
             throw new ShoppingCartNotFoundException("Shopping cart not found!");
         }

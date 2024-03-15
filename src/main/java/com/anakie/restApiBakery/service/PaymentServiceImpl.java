@@ -2,11 +2,10 @@ package com.anakie.restApiBakery.service;
 
 import com.anakie.restApiBakery.entity.*;
 import com.anakie.restApiBakery.exception.*;
-import com.anakie.restApiBakery.repository.AccountStatusHistoryRepository;
-import com.anakie.restApiBakery.repository.OrderStatusHistoryRepository;
 import com.anakie.restApiBakery.repository.PaymentRepository;
 import com.anakie.restApiBakery.repository.PaymentStatusHistoryRepository;
 import jakarta.mail.MessagingException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,24 +17,22 @@ import java.util.Random;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class PaymentServiceImpl implements PaymentService {
+    @Autowired
     private final PaymentRepository paymentRepository;
+    @Autowired
     private final OrderService orderService;
+    @Autowired
     private final AccountService accountService;
+    @Autowired
     private final PaymentStatusHistoryRepository paymentStatusHistoryRepository;
-
-
+    @Autowired
     private final EmailService emailService;
 
-
     @Autowired
-    public PaymentServiceImpl(PaymentRepository paymentRepository, OrderService orderService, AccountService accountService, PaymentStatusHistoryRepository paymentStatusHistoryRepository, OrderStatusHistoryRepository orderStatusHistoryRepository, AccountStatusHistoryRepository accountStatusHistoryRepository, EmailService emailService) {
-        this.paymentRepository = paymentRepository;
-        this.orderService = orderService;
-        this.accountService = accountService;
-        this.paymentStatusHistoryRepository = paymentStatusHistoryRepository;
-        this.emailService = emailService;
-    }
+    private final IngredientService ingredientService;
+
 
     @Override
     public Payment save(PaymentDTO paymentDTO) throws OrderNotFoundException, ProductNotFoundException, InsufficientFundsException, UserNotFoundException, AccountNotFoundException, MessagingException {
@@ -57,9 +54,9 @@ public class PaymentServiceImpl implements PaymentService {
         }
         // here we pay depending on the chosen payment method
         switch (currentPaymentMethod) {
-            case ACCOUNT_AND_CARD -> payment = accountAndCard(payment);
-            case CARD -> payment = cardPayment(payment);
-            case ACCOUNT -> payment = accountPayment(payment);
+            case ACCOUNT_AND_CARD ->accountAndCard(payment);
+            case CARD -> cardPayment(payment);
+            case ACCOUNT ->accountPayment(payment);
         }
 
         try {
@@ -70,6 +67,9 @@ public class PaymentServiceImpl implements PaymentService {
             } catch (Exception ex) {
                 throw new PaymentFailedException("Payment failed due to: " + ex.getMessage());
             }
+
+            // after payment, my database stock copy must be updated with new data, so that the copy references the current state of ingredients available at the time
+            ingredientService.reloadStockFromDb();
             return payment;
         } catch (OutOfStockException ex) {
             throw new PaymentFailedException("Payment failed due to: " + ex.getMessage());
@@ -105,7 +105,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     // if the user pays from their back accounts not the app account, we call this method
-    private Payment cardPayment(Payment payment) {
+    private void cardPayment(Payment payment) {
 
         Long userId = payment.getOrder().getUser().getId();
         double totalPrice = payment.getOrder().getTotalPrice();
@@ -124,10 +124,10 @@ public class PaymentServiceImpl implements PaymentService {
 
         // if program is here means we have enough funds and successful payment
         // save payment to the  database so that we can get its ID, this enables use to link the status to payment
-      return  changePaymentStatus(payment = paymentRepository.save(payment), Status.Successful); // link the status to payment, since it must reference the payment
+      changePaymentStatus(paymentRepository.save(payment)); // link the status to payment, since it must reference the payment
     }
 
-    private Payment accountPayment(Payment payment) {
+    private void accountPayment(Payment payment) {
         Long userId = payment.getOrder().getUser().getId();
         double totalPrice = payment.getOrder().getTotalPrice();
         Account account = accountService.findByUserId(userId);
@@ -144,15 +144,15 @@ public class PaymentServiceImpl implements PaymentService {
                 throw new InvalidPaymentMethod(e.getMessage());
             }
 
-            changePaymentStatus(payment = paymentRepository.save(payment), Status.Successful);  // link the status to payment, but save payment 1st to get its id
+            changePaymentStatus(paymentRepository.save(payment));  // link the status to payment, but save payment 1st to get its id
 
         } else {
             throw new InsufficientFundsException("Insufficient funds on account, " + account.getId() + ", use other payment methods");
         }
-        return payment;
+
     }
 
-    private Payment accountAndCard(Payment payment) {
+    private void accountAndCard(Payment payment) {
 
         Long userId = payment.getOrder().getUser().getId();
         double totalPrice = payment.getOrder().getTotalPrice();
@@ -176,21 +176,18 @@ public class PaymentServiceImpl implements PaymentService {
             accountService.useFunds(account, leftMoney, Status.Partially, 1);
         } catch (Exception e) {
             throw new InvalidPaymentMethod(e.getMessage()); // I'll need to come back and fix how I handle this part.
-
         }
 
-        changePaymentStatus(payment = paymentRepository.save(payment), Status.Successful); // link the status to payment, since it must reference the payment
+        changePaymentStatus(paymentRepository.save(payment)); // link the status to payment, since it must reference the payment
 
-        return payment;
     }
 
-    @Override
-    public Payment changePaymentStatus(Payment payment, Status status) {
+    private void changePaymentStatus(Payment payment) {
         PaymentStatusHistory paymentStatusHistory = new PaymentStatusHistory();
         paymentStatusHistory.setPayment(payment);
-        paymentStatusHistory.setStatus(status);
+        paymentStatusHistory.setStatus(Status.Successful);
         paymentStatusHistory.setDateTime(LocalDateTime.now());
         payment.getPaymentStatusHistories().add( paymentStatusHistoryRepository.save(paymentStatusHistory));
-        return payment;
+
     }
 }

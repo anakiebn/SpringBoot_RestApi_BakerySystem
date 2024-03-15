@@ -49,7 +49,7 @@ public class UserServiceImpl implements UserService {
         Account account = new Account();
         account.setAmount(0); // by default, they will have R 0.00 balance
         account.setUser(user);
-        ; // link db account to the present account to get its id
+         // link db account to the present account to get its id
         accountService.changeAccountStatus(account=accountService.save(account),Status.New);
         return user;
     }
@@ -71,9 +71,7 @@ public class UserServiceImpl implements UserService {
             userRepository.save(user);
         }
         throw new UserNotFoundException("Failed to update, user " + user.getId() + " not found!");
-
-
-    }
+}
 
     @Override
     public List<User> findAll() {

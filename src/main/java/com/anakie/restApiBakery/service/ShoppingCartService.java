@@ -18,5 +18,5 @@ public interface ShoppingCartService {
     ShoppingCart findById(Long id) throws ShoppingCartNotFoundException;
     boolean existsById(Long id);
 
-    boolean cartValid(ShoppingCart cart) throws ShoppingCartNotFoundException, CartEmptyException, ProductNotFoundException;
+    boolean validateCart(ShoppingCart cart) throws ShoppingCartNotFoundException, CartEmptyException, ProductNotFoundException;
 }

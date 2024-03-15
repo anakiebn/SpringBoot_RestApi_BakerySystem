@@ -17,7 +17,7 @@ public interface UserService {
 
     User update(User user) throws UserNotFoundException;
     List<User> findAll();
-    User saveAddress(Address address, Long userId) throws UserNotFoundException, Exception;
+    User saveAddress(Address address, Long userId) throws Exception;
 
     List<User> findAllActiveUsers();
 

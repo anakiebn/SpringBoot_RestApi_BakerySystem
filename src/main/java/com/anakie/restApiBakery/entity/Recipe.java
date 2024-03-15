@@ -2,18 +2,19 @@ package com.anakie.restApiBakery.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Entity
 @Setter
 @Getter
-@RequiredArgsConstructor
+@NoArgsConstructor
 public class Recipe {
 
     @Id
@@ -23,17 +24,29 @@ public class Recipe {
     @Column(nullable = false)
     private String name;
 
-    @ManyToMany
-    @JoinTable(
-            name="recipes_ingredients",
-            joinColumns = @JoinColumn(name="recipe_id"),
-            inverseJoinColumns = @JoinColumn(name="recipeIngr_id")
-    )
-    private List<RecipeIngredient> recipeIngredients;
+    // Using @ElementCollection to represent the map of ingredients and their quantities
+    @ElementCollection
+    @CollectionTable(name = "recipe_ingredients_mapping", joinColumns = @JoinColumn(name = "recipe_id"))
+    @MapKeyJoinColumn(name = "ingredient_id") // Specifies the foreign key column for the map key
+    @Column(name = "quantity") // Specifies the column for the quantity of the ingredient
+    private Map<Ingredient, Double> recipeIngredients = new HashMap<>();
 
     @JsonIgnore
     @OneToOne(mappedBy = "recipe")
     private Product product;
+
+    public Recipe(String name, Map<Ingredient, Double> recipeIngredients) {
+        this.name=name;
+        this.recipeIngredients=recipeIngredients;
+    }
+
+    public Map<Long,Double> toRecipeIngrId(){
+        return recipeIngredients.entrySet().stream()
+                .collect(
+                        Collectors.groupingBy(
+                                e1->e1.getKey().getId(),(HashMap::new),(Collectors.summingDouble(Map.Entry::getValue)))
+                );
+    }
 
     @Override
     public final boolean equals(Object o) {

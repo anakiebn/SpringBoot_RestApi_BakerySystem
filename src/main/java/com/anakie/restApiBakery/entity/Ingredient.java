@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.proxy.HibernateProxy;
 
 import java.util.List;
@@ -13,6 +14,7 @@ import java.util.Objects;
 @Entity
 @Setter
 @Getter
+@ToString
 @RequiredArgsConstructor
 public class Ingredient {
 
@@ -23,7 +25,6 @@ public class Ingredient {
     @Enumerated(EnumType.STRING)
     private Unit unit; // if it's a litre
 
-
     @Column(length = 50,unique = true,nullable = false)
     private String name; // and the name is milk
 
@@ -31,9 +32,10 @@ public class Ingredient {
     private double quantity; //  then the quantity is like saying I have 2 litre of milk
 
     @Column(scale=3) // maximum decimal point of 2
-    private double minQuantity; //  the lowest quantity an ingredient can have before it's declared outOfStock
+    private double min_quantity; //  the lowest quantity an ingredient can have before it's declared outOfStock
 
     @Override
+
     public final boolean equals(Object o) {
         if (this == o) return true;
         if (o == null) return false;

@@ -47,8 +47,6 @@ public class ReportServiceImpl implements ReportService {
                 ));
     }
 
-
-
     @Override
     public Map<Long, Integer> mostSoldCategories(LocalDate fromDate, LocalDate toDate) {
         return orderService.findAll().stream()
@@ -71,8 +69,6 @@ public class ReportServiceImpl implements ReportService {
                         LinkedHashMap::new
                 ));
     }
-
-
 
     // Searches orders by date, still under processing
     @Override
@@ -106,7 +102,7 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public List<Ingredient> ingredientsToOrder() {
         // we'll let the admin/ system manager declare their minimum quantity for each ingredient
-        return ingredientService.findAll().stream().filter(ingr -> ingr.getQuantity() <= ingr.getMinQuantity()).toList();
+        return ingredientService.findAll().stream().filter(ingr -> ingr.getQuantity() <= ingr.getMin_quantity()).toList();
     }
 
     @Override

@@ -1,9 +1,9 @@
 package com.anakie.restApiBakery.controller;
 
 import com.anakie.restApiBakery.entity.Ingredient;
-import com.anakie.restApiBakery.entity.IngredientMinQty;
 import com.anakie.restApiBakery.exception.IngredientNotFoundException;
 import com.anakie.restApiBakery.service.IngredientService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -11,16 +11,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/ingredients")
+@RequiredArgsConstructor
 public class IngredientController {
 
 
     @Autowired
-    private IngredientService ingredientService;
+    private final IngredientService ingredientService;
     @GetMapping("/id")
     public ResponseEntity<Ingredient> findById(@PathVariable Long id) throws IngredientNotFoundException {
         return new ResponseEntity<>(ingredientService.findById(id), HttpStatus.OK);
@@ -46,8 +48,8 @@ public class IngredientController {
     }
 
     @PostMapping("/saveIngrMinQty")
-    public ResponseEntity<List<IngredientMinQty>> save(@RequestBody List<IngredientMinQty> ingredientMinQty) {
-        return new ResponseEntity<>(ingredientService.save(ingredientMinQty), HttpStatus.OK);
+    public ResponseEntity<Void> saveIngrMinQty(@RequestBody Map<Long, Double> ingredientMinQty) {
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }
