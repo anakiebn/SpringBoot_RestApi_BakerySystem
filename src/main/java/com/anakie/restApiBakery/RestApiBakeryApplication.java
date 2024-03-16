@@ -13,7 +13,19 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 public class RestApiBakeryApplication {
 	
 	public static void main(String[] args) {
+
 		SpringApplication.run(RestApiBakeryApplication.class, args);
+		String customAsciiArt =
+				"         /|                     .:                    \n" +
+						"     _  / |                     ::         .-.        \n" +
+						"    (  /  |  . . ,';.  .-.      ;;.-.      `-'   .-.  \n" +
+						"     `/.__|_.' ;;  ;; ;   :     ;; .'     ;'   .;.-'  \n" +
+						" .:' /    |   ';  ;;  `:::'-' _.'`  `. _.;:._.  `:::' \n" +
+						"(__.'     `-' ;    `.                                 \n" ;
+
+		System.out.println(customAsciiArt);
+
+
 	}
 
 }
