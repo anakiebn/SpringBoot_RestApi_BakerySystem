@@ -37,6 +37,7 @@ public class UserController {
     public ResponseEntity<List<User>> findAllActiveUsers() {
         return new ResponseEntity<>(userService.findAllActiveUsers(), HttpStatus.OK);
     }
+
     @GetMapping("/noneActiveUsers")
     public ResponseEntity<List<User>> findAllNoneActiveUsers() {
         return new ResponseEntity<>(userService.findAllNoneActiveUsers(), HttpStatus.OK);
