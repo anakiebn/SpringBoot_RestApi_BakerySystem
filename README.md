@@ -35,7 +35,7 @@ Follow these steps to set up and run the Spring Boot REST API Java project on yo
 Clone the project repository to your local machine using Git:
 
 ```bash
-git clone https://github.com/your-username/your-project.git
+git clone https://github.com/anakiebn/SpringBoot_RestApi_BakerySystem.git
 ```
 ### Build the Project
 Navigate to the project directory and build the project using Maven:
