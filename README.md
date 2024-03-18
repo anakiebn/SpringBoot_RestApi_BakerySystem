@@ -1,4 +1,3 @@
-My read me file:
 # SpringBoot_RestApi_BakerySystem
 
 This is a REST API service of a bakery system. You can register, view products, order, make payments, manage - stocks, orders, payments, users etc.
