@@ -39,41 +39,5 @@ Clone the project repository to your local machine using Git:
 git clone https://github.com/anakiebn/SpringBoot_RestApi_BakerySystem.git
 ```
 
-### Setup
-
-- After installing your jdk 17 or above, maven, MySQL server and your database then you can follow these steps.
-#### 1. Database:
-
- - Make sure your MySQL server is running, by checking it's status on Services.
-     
-   ```
-     Press Win + R to open the Run dialog.
-     Type services.msc and press Enter.
-     Look for the MySQL service in the list and check its status. If MySQL is running, the status will be "Running."
-    ```
-  - On Heidi, create a database, give it a name of your choice but you need to save this name.
-#### 2. Maven
-  - Confirm if your Maven is running with this commnand on your terminal.
-    ```
-    mvn -v
-    ```
-    
-### Build the Project
-Navigate to the project directory and build the project using Maven:
-
-
-
-
-
-bash
-Copy code
-cd your-project
-mvn clean install
-This command will compile the source code, run tests, and package the application into a JAR file.
-
-If you face any problems, email me @ 
-```Email
-anakiebn@gmail.com
-```
 
 
