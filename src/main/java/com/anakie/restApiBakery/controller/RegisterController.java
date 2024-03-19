@@ -25,7 +25,7 @@ public class RegisterController {
         return new ResponseEntity<>("Email successfully sent to "+user.getEmail(), HttpStatus.CREATED);
     }
 
-    @PostMapping("/confirmRegistration")
+    @PostMapping("/confirmRegistration/{providedCode}")
     public ResponseEntity<User> register(@PathVariable String providedCode) throws DuplicateEmailException {
         return new ResponseEntity<>(registerService.register(providedCode), HttpStatus.CREATED);
     }
