@@ -24,30 +24,20 @@ With its intuitive interface and robust functionality, the SpringBoot_RestApi_Ba
 
 Follow these steps to set up and run the Spring Boot REST API Java project on your local machine:
 
-### Prerequisites
+### Prerequisites:
 
 - JDK 17: Make sure you have Java Development Kit (JDK) version 17 or higher installed on your system. You can download and install JDK 17 from the [official Oracle website](https://www.oracle.com/java/technologies/javase-jdk17-downloads.html) or use a package manager like [SDKMAN!](https://sdkman.io/) to manage your Java installations.
 - Maven: Ensure that you have Apache Maven installed on your system. You can download and install Maven from the [official Apache Maven website](https://maven.apache.org/download.cgi) or use a package manager like [SDKMAN!](https://sdkman.io/) or [Homebrew](https://brew.sh/) (for macOS users) to install it.
+- MySQL RDBMS: Make sure you have MySQL server installed on your system. You can download and install MySQL from the [official MySQL website] (https://dev.mysql.com/downloads/workbench) or use a package manager.
+- Database:  I prefer Heidi as my database manager but you can install any MySQL database. You can download heidi from [official Heidi Website](https://www.heidisql.com/download.php).
 
-### Clone the Repository
+### Clone the Repository:
 
 Clone the project repository to your local machine using Git:
 
 ```bash
 git clone https://github.com/anakiebn/SpringBoot_RestApi_BakerySystem.git
 ```
-### Build the Project
-Navigate to the project directory and build the project using Maven:
 
-bash
-Copy code
-cd your-project
-mvn clean install
-This command will compile the source code, run tests, and package the application into a JAR file.
-
-If you face any problems, email me @ 
-```Email
-anakiebn@gmail.com
-```
 
 
