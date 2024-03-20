@@ -40,6 +40,11 @@ public class ingredientServiceImpl implements IngredientService {
     }
 
     @Override
+    public List<Ingredient> save(List<Ingredient> ingredients) {
+        return null;
+    }
+
+    @Override
     public void reloadStockFromDb(){
         stockDb = ingredientRepository.findAll().stream()
                 .collect(Collectors.groupingBy(

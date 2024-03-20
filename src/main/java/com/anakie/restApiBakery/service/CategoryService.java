@@ -8,6 +8,7 @@ import java.util.List;
 
 public interface CategoryService {
     Category save(Category category) throws ConstraintViolationException;
+    List<Category> save(List<Category> categories)throws ConstraintViolationException;
     Category findById(Long id) throws CategoryNotFoundException;
     List<Category> findAll();
     void deleteById(Long id) throws CategoryNotFoundException;

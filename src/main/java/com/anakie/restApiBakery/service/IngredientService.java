@@ -10,6 +10,8 @@ import java.util.Map;
 public interface IngredientService {
 
     Ingredient save(Ingredient ingredient);
+
+    List<Ingredient> save(List<Ingredient> ingredients);
     void reloadStockFromDb();
 
     boolean existsById(Long id);

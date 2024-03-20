@@ -42,6 +42,12 @@ public class ProductServiceImpl implements ProductService{
         Product product=productDTO.toProduct(categoryService,recipeService);
         return productRepository.save(product);
     }
+
+    @Override
+    public List<Product> save(List<ProductDTO> productDTOS) throws RecipeNotFoundException, CategoryNotFoundException, PropertyValueException {
+        return null;
+    }
+
     @Override
     public Product findById(Long id) throws ProductNotFoundException {
         return productRepository.findById(id).orElseThrow(()->new ProductNotFoundException("Product "+id+" not found, use an existing id!"));

@@ -35,6 +35,11 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    public List<Category> save(List<Category> categories) throws ConstraintViolationException {
+        return null;
+    }
+
+    @Override
     public Category findById(Long id) throws CategoryNotFoundException {
         return categoryRepository.findById(id).orElseThrow(() -> new CategoryNotFoundException("Category " + id + " not found! Use existing id"));
     }
