@@ -20,12 +20,15 @@ import java.util.List;
 @Service
 public class AccountServiceImpl implements AccountService {
 
-    @Autowired
-    private AccountRepository accountRepository;
-    @Autowired
-    private AccountStatusHistoryRepository accountStatusHistoryRepository;
 
+    private final AccountRepository accountRepository;
 
+    private final AccountStatusHistoryRepository accountStatusHistoryRepository;
+
+    public AccountServiceImpl(AccountRepository accountRepository, AccountStatusHistoryRepository accountStatusHistoryRepository) {
+        this.accountRepository = accountRepository;
+        this.accountStatusHistoryRepository = accountStatusHistoryRepository;
+    }
 
     @Override
     public Account save(Account account) {

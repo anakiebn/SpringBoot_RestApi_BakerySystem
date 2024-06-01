@@ -18,7 +18,7 @@ public interface IngredientService {
 
     Ingredient findById(Long id) throws IngredientNotFoundException;
 
-    void returnIngrToCopy(Long recipeIngrId, Double recipeIngrQty, int proQty);
+    void returnIngrToStockDb(Long recipeIngrId, Double recipeIngrQty, int proQty);
     void confirmStockAvailability(Long recipeIngrId, double recipeIngrQty, int proQty) throws IngredientNotFoundException;
 
     List<Ingredient> findAll();

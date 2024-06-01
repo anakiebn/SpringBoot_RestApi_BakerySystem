@@ -17,9 +17,12 @@ import java.io.FileOutputStream;
 @Slf4j
 public class DocumentServiceImpl implements DocumentService {
 
-    @Autowired
-    private ProductService productService;
 
+    private final ProductService productService;
+
+    public DocumentServiceImpl(ProductService productService) {
+        this.productService = productService;
+    }
 
     @Override
     public String invoice(Order order) {

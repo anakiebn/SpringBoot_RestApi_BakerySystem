@@ -17,20 +17,34 @@ import java.util.Map;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
-    @Autowired
+
     private final OrderStatusHistoryRepository orderStatusHistoryRepository;
-    @Autowired
+
     private  final  OrderRepository orderRepository;
-    @Autowired
+
     private  final UserService userService;
-    @Autowired
+
     private  final  ShoppingCartService shoppingCartService;
-    @Autowired
+
     private  final  ProductService productService;
-    @Autowired
+
     private  final  IngredientService ingredientService;
+
+    public OrderServiceImpl(OrderStatusHistoryRepository orderStatusHistoryRepository,
+                            OrderRepository orderRepository,
+                            UserService userService,
+                            ShoppingCartService shoppingCartService,
+                            ProductService productService,
+                            IngredientService ingredientService
+    ) {
+        this.orderStatusHistoryRepository = orderStatusHistoryRepository;
+        this.orderRepository = orderRepository;
+        this.userService = userService;
+        this.shoppingCartService = shoppingCartService;
+        this.productService = productService;
+        this.ingredientService = ingredientService;
+    }
 
     @Override
     public Order save(OrderDTO orderDTO) throws Exception {
@@ -64,7 +78,7 @@ public class OrderServiceImpl implements OrderService {
 
 
     // once an order is made, we bake, when we bake we use ingredients, meaning, we subtract
-    // all used ingredients according to the recipe
+    // all used ingredients according to the recipe... only when the user has paid, not in order time.
     public void bakeProducts(Order order) throws OutOfStockException {
         order.getShoppingCart().getCartItems().forEach(cartItem -> {
 
@@ -74,6 +88,9 @@ public class OrderServiceImpl implements OrderService {
                 ingredientService.useIngredient(recipeIngr.getId(),recipeIngredients.get(recipeIngr),cartItem.getProductQty());
             }
         });
+        // When I bake, my database stock copy must be updated with new data,
+        // so that the stockDb(copy) now  references the current state of ingredients available from database in real time
+        ingredientService.reloadStockFromDb();
     }
 
     @Override

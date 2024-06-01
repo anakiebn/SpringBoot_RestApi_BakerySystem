@@ -5,7 +5,6 @@ import com.anakie.restApiBakery.exception.DuplicateEmailException;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.mail.SimpleMailMessage;
@@ -21,19 +20,24 @@ import java.util.UUID;
 @Slf4j
 public class EmailServiceImpl implements EmailService {
 
-    @Autowired
-    private JavaMailSender javaMailSender;
-    private SimpleMailMessage simpleMailMessage;
-    @Autowired
-    private DocumentService recordService;
 
-    @Autowired
-    private UserService userService;
+    private final JavaMailSender javaMailSender;
+    private SimpleMailMessage simpleMailMessage;
+
+    private final DocumentService recordService;
+
+
+    private final UserService userService;
 
     private String code;
     @Value("${spring.mail.username}")
     private String sender;
 
+    public EmailServiceImpl(JavaMailSender javaMailSender, DocumentService recordService, UserService userService) {
+        this.javaMailSender = javaMailSender;
+        this.recordService = recordService;
+        this.userService = userService;
+    }
 
     @Override
     public void registrationEmail(String userEmail, String username) throws DuplicateEmailException {
@@ -86,6 +90,7 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     public void invoiceEmail(Payment payment) throws MessagingException {
+
         log.info("Creating invoice email");
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);

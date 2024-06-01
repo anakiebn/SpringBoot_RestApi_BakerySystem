@@ -21,8 +21,6 @@ public class ingredientServiceImpl implements IngredientService {
 
     private static Map<Long, Double> stockDb;
 
-
-    @Autowired
     public ingredientServiceImpl(IngredientRepository ingredientRepository) {
         this.ingredientRepository = ingredientRepository;
         if (stockDb == null) {
@@ -44,6 +42,15 @@ public class ingredientServiceImpl implements IngredientService {
         return null;
     }
 
+    /**
+     * Copies the stock ingredients from the database to ensure that each user has their own copy to operate on.
+     *
+     * This method ensures that we start reducing the stock for real only when an order is being paid for, not when the user places the order.
+     * We do this to ensure that we only start baking when the user has paid for their order.
+     *
+     * We perform all the reducing and adding of ingredients on this temporary stock database when the user places an order.
+     * When the user has paid for their order, we update the changes in the real database accordingly.
+     */
     @Override
     public void reloadStockFromDb(){
         stockDb = ingredientRepository.findAll().stream()
@@ -53,6 +60,7 @@ public class ingredientServiceImpl implements IngredientService {
                         Collectors.summingDouble(Ingredient::getQuantity)
                 ));
     }
+
 
     @Override
     public boolean existsById(Long id) {
@@ -65,8 +73,17 @@ public class ingredientServiceImpl implements IngredientService {
         return ingredientRepository.findById(id).orElseThrow(() -> new IngredientNotFoundException("Ingredient " + id + " not found, use an existing id!"));
     }
 
+    /**
+     * Used to return ingredients back into our stock ingredient which acts as a copy of our real stock db, since we've now removed a product from our cart meaning
+     * we never used the ingredients, so we return them to stock. Remember that we remove them for real at payment time not
+     * order time
+     *
+     * @param recipeIngrId Ingredient you want to add
+     * @param recipeIngrQty The quantity of the ingredient
+     * @param proQty The number of products you are dealing with
+     */
     @Override
-    public void returnIngrToCopy(Long recipeIngrId, Double recipeIngrQty, int proQty) {
+    public void returnIngrToStockDb(Long recipeIngrId, Double recipeIngrQty, int proQty) {
 
         if(stockDb.containsKey(recipeIngrId)){
             throw new IngredientNotFoundException("No such ingredient exists in stock db");
@@ -91,6 +108,15 @@ public class ingredientServiceImpl implements IngredientService {
         return ingredientRepository.save(ingredient);
     }
 
+
+    /**
+     * This method is used to confirm if we have enough ingredients to bake the ordered amount of product/s
+     *
+     * @param recipeIngrId The recipe's id you want to check if it's available or not
+     * @param recipeIngrQty The recipes' ingredient's quantity
+     * @param proQty The number of products you have
+     * @throws IngredientNotFoundException If you pass an id of an ingredient not known to our system, an exception will be thrown
+     */
     @Override
     public void confirmStockAvailability(Long recipeIngrId, double recipeIngrQty, int proQty) throws IngredientNotFoundException {
 
@@ -106,6 +132,7 @@ public class ingredientServiceImpl implements IngredientService {
 
     @Override
     public List<Ingredient> findAll() {
+
         return ingredientRepository.findAll();
     }
 
@@ -118,6 +145,12 @@ public class ingredientServiceImpl implements IngredientService {
         update(ingredient); // update the db
     }
 
+    /**
+     *
+     * Used to save all the minimum quantities to have in each ingredient, if this quantity is reached your system will flag
+     * that you are running low on stock, pass this value, you should really order or add ingredient.
+     * @param ingredientMinQuantities This map hold ingredients with minimum id, ingredients id used as key and double as the minimum quantity
+     */
     @Override
     public void  saveIngrMinQty(Map<Long, Double> ingredientMinQuantities) {
         ingredientMinQuantities.forEach((key, value) -> {

@@ -30,10 +30,6 @@ public class PaymentServiceImpl implements PaymentService {
     @Autowired
     private final EmailService emailService;
 
-    @Autowired
-    private final IngredientService ingredientService;
-
-
     @Override
     public Payment save(PaymentDTO paymentDTO) throws OrderNotFoundException, ProductNotFoundException, InsufficientFundsException, UserNotFoundException, AccountNotFoundException, MessagingException {
         Payment payment = paymentDTO.toPayment(orderService);
@@ -62,19 +58,15 @@ public class PaymentServiceImpl implements PaymentService {
         try {
             orderService.bakeProducts(payment.getOrder()); // this method subtracts ingredients in database, since baking means using stock ingredients
             orderService.changeOrderStatus(order, Status.Preparing);  // after paying we change order status to `preparing`
-            try {
-                emailService.invoiceEmail(payment); // create and send invoice
-            } catch (Exception ex) {
-                throw new PaymentFailedException("Payment failed due to: " + ex.getMessage());
-            }
 
-            // after payment, my database stock copy must be updated with new data, so that the copy references the current state of ingredients available at the time
-            ingredientService.reloadStockFromDb();
-            return payment;
+            emailService.invoiceEmail(payment); // create and send invoice
+
         } catch (OutOfStockException ex) {
             throw new PaymentFailedException("Payment failed due to: " + ex.getMessage());
+        } catch (MessagingException ex){
+            log.error("Error occurred while sending invoice email on payment!");
         }
-
+        return payment;
 
     }
 
@@ -115,7 +107,6 @@ public class PaymentServiceImpl implements PaymentService {
         if (payment.getAmount() < totalPrice) {
             throw new InsufficientFundsException("Insufficient funds! Required amount, R " + totalPrice + " but you provided R " + payment.getAmount());
         }
-
 
         // if they are paying more than they should, we give them a change
         if (payment.getAmount() > totalPrice) {
@@ -188,6 +179,5 @@ public class PaymentServiceImpl implements PaymentService {
         paymentStatusHistory.setStatus(Status.Successful);
         paymentStatusHistory.setDateTime(LocalDateTime.now());
         payment.getPaymentStatusHistories().add( paymentStatusHistoryRepository.save(paymentStatusHistory));
-
     }
 }
