@@ -1,5 +1,3 @@
-Here's the corrected version of your text:
-
 # SpringBoot_RestApi_BakerySystem
 
 This is a REST API service for a bakery system. You can register, view products, place orders, make payments, and manage stocks, orders, payments, users, etc. Essentially, this allows you to buy and sell bakery products online. The system uses an order-before-baking approach, meaning you can't order products for which we don't have the necessary ingredients. We must have enough ingredients before we can take certain orders. With this system, you can manage your stock and know exactly how many ingredients you've used.
