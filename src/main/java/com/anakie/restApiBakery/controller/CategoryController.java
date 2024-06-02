@@ -15,11 +15,15 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/categories")
 @Slf4j
-@RequiredArgsConstructor
 public class CategoryController {
 
     @Autowired
     private final CategoryService categoryService;
+
+    public CategoryController(CategoryService categoryService) {
+        this.categoryService = categoryService;
+    }
+
     @GetMapping("/find/{id}")
     public ResponseEntity<Category> findById(@PathVariable Long id) throws CategoryNotFoundException {
             return new ResponseEntity<>(categoryService.findById(id), HttpStatus.OK);

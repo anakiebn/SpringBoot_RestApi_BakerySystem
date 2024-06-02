@@ -17,12 +17,18 @@ import java.util.List;
 
 @Service
 public class ProductServiceImpl implements ProductService{
-    @Autowired
-    private ProductRepository productRepository;
-    @Autowired
-    private CategoryService categoryService;
-    @Autowired
-    private RecipeService recipeService;
+
+    private final ProductRepository productRepository;
+
+    private final CategoryService categoryService;
+
+    private final RecipeService recipeService;
+
+    public ProductServiceImpl(ProductRepository productRepository, CategoryService categoryService, RecipeService recipeService) {
+        this.productRepository = productRepository;
+        this.categoryService = categoryService;
+        this.recipeService = recipeService;
+    }
 
     @Override
     public Product save(ProductDTO productDTO) throws RecipeNotFoundException, CategoryNotFoundException, PropertyValueException {

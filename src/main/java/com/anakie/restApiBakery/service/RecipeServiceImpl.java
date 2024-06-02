@@ -15,13 +15,16 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-@RequiredArgsConstructor
 public class RecipeServiceImpl implements RecipeService {
 
-    @Autowired
     private final RecipeRepository recipeRepository;
-    @Autowired
+
     private final IngredientService ingredientService;
+
+    public RecipeServiceImpl(RecipeRepository recipeRepository, IngredientService ingredientService) {
+        this.recipeRepository = recipeRepository;
+        this.ingredientService = ingredientService;
+    }
 
     @Override
     public Recipe save(RecipeDTO recipeDTO) throws MissingIngredientException, IngredientNotFoundException, SQLIntegrityConstraintViolationException {

@@ -18,10 +18,14 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/payments")
 @Slf4j
-@RequiredArgsConstructor
 public class PaymentController {
-    @Autowired
+
     private final PaymentService paymentService;
+
+    public PaymentController(PaymentService paymentService) {
+        this.paymentService = paymentService;
+    }
+
     @GetMapping("/find/{id}")
     public ResponseEntity<Payment> findById(@PathVariable Long id) throws PaymentNotFoundException {
 

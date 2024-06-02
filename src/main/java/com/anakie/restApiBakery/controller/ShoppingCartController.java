@@ -13,11 +13,14 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/shoppingCarts")
-@RequiredArgsConstructor
+
 public class ShoppingCartController {
 
-    @Autowired
     private final ShoppingCartService shoppingCartService;
+
+    public ShoppingCartController(ShoppingCartService shoppingCartService) {
+        this.shoppingCartService = shoppingCartService;
+    }
 
     @GetMapping("/find/{id}")
     public ResponseEntity<ShoppingCart> findById(@PathVariable Long id) throws ShoppingCartNotFoundException {

@@ -17,11 +17,13 @@ import java.util.List;
 @RestController
 @Slf4j
 @RequestMapping("/api/v1/users")
-@RequiredArgsConstructor
 public class UserController {
 
-    @Autowired
     private final UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     @GetMapping("/find/{id}")
     public ResponseEntity<User> findById(@PathVariable Long id) throws UserNotFoundException {

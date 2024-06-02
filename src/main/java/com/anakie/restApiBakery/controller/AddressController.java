@@ -13,10 +13,15 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/addresses")
-@RequiredArgsConstructor
+
 public class AddressController {
-    @Autowired
+
     private final AddressService addressService;
+
+    public AddressController(AddressService addressService) {
+        this.addressService = addressService;
+    }
+
 
     @GetMapping("/find/{id}")
     public ResponseEntity<Address> findById(@PathVariable Long id) throws AddressNotFoundException {

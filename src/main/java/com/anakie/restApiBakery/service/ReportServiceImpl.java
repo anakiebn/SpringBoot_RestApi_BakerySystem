@@ -14,15 +14,19 @@ import java.util.stream.Collectors;
 @Service
 public class ReportServiceImpl implements ReportService {
 
-    @Autowired
-    private IngredientService ingredientService;
+    private final IngredientService ingredientService;
 
-    @Autowired
-    private OrderService orderService;
 
-    @Autowired
-    private ProductService productService;
+    private final OrderService orderService;
 
+
+    private final ProductService productService;
+
+    public ReportServiceImpl(IngredientService ingredientService, OrderService orderService, ProductService productService) {
+        this.ingredientService = ingredientService;
+        this.orderService = orderService;
+        this.productService = productService;
+    }
 
     @Override
     public Map<Long, Integer> mostSoldProducts(LocalDate fromDate, LocalDate toDate) {

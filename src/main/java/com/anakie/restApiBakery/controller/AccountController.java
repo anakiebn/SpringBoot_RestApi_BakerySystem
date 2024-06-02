@@ -16,10 +16,14 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/accounts")
-@RequiredArgsConstructor
 public class AccountController {
-    @Autowired
+
     private final AccountService accountService;
+
+
+    public AccountController(AccountService accountService) {
+        this.accountService = accountService;
+    }
 
     // CRUD
     @GetMapping("/find/{id}")

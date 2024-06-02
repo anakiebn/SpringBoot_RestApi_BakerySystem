@@ -11,12 +11,13 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/registration")
-@RequiredArgsConstructor
 public class RegisterController {
 
-
-    @Autowired
     private final RegisterService registerService;
+
+    public RegisterController(RegisterService registerService) {
+        this.registerService = registerService;
+    }
 
     @PostMapping("/register")
     public ResponseEntity<String> sendEmail(@RequestBody User user) throws DuplicateEmailException {

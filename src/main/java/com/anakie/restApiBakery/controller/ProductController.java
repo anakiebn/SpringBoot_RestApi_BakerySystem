@@ -18,11 +18,15 @@ import java.util.List;
 @RestController
 @Slf4j
 @RequestMapping("/api/v1/products")
-@RequiredArgsConstructor
 public class ProductController {
 
-    @Autowired
+
     private final ProductService productService;
+
+    public ProductController(ProductService productService) {
+        this.productService = productService;
+    }
+
     @GetMapping("/find/{id}")
     public ResponseEntity<Product> findById(@PathVariable Long id) throws ProductNotFoundException {
 

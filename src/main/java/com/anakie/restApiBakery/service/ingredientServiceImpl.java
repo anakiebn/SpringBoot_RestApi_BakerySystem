@@ -132,7 +132,6 @@ public class ingredientServiceImpl implements IngredientService {
 
     @Override
     public List<Ingredient> findAll() {
-
         return ingredientRepository.findAll();
     }
 

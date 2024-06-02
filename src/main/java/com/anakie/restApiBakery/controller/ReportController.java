@@ -16,11 +16,13 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/reports")
-@RequiredArgsConstructor
 public class ReportController {
 
-    @Autowired
     private final ReportService reportService;
+
+    public ReportController(ReportService reportService) {
+        this.reportService = reportService;
+    }
 
     @GetMapping("/ordersPlaced")
     public ResponseEntity<List<Order>> ordersPlaced(@RequestBody List<LocalDate> dates){

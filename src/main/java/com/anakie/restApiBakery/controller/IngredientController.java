@@ -17,12 +17,17 @@ import java.util.Map;
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/ingredients")
-@RequiredArgsConstructor
+
 public class IngredientController {
 
 
     @Autowired
     private final IngredientService ingredientService;
+
+    public IngredientController(IngredientService ingredientService) {
+        this.ingredientService = ingredientService;
+    }
+
     @GetMapping("/find/{id}")
     public ResponseEntity<Ingredient> findById(@PathVariable Long id) throws IngredientNotFoundException {
         return new ResponseEntity<>(ingredientService.findById(id), HttpStatus.OK);

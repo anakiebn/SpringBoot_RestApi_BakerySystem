@@ -8,12 +8,16 @@ import org.springframework.stereotype.Service;
 @Service
 public class RegisterServiceImpl implements RegisterService {
 
-    @Autowired
-    private EmailService emailService;
 
-    @Autowired
-    private UserService userService;
+    private final EmailService emailService;
+
+    private  final UserService userService;
     private User user;
+
+    public RegisterServiceImpl(EmailService emailService, UserService userService) {
+        this.emailService = emailService;
+        this.userService = userService;
+    }
 
     @Override
     public void sendCode() throws DuplicateEmailException {

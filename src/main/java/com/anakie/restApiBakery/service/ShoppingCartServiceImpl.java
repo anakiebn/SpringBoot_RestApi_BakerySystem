@@ -16,23 +16,20 @@ import java.util.*;
 
 @Service
 @Slf4j
-@RequiredArgsConstructor
 public class ShoppingCartServiceImpl implements ShoppingCartService {
 
-    // this cart simply holds what we have at the moment
-    private final Map<Long, Integer> cart = new HashMap<>();
-
-    @Autowired
+    // The cart we have, productId as key, and it's quantity as value
+    private Map<Long, Integer> cart;
     private final ProductService productService;
-    @Autowired
     private final IngredientService ingredientService;
-
-    @Autowired
     private final ShoppingCartRepository shoppingCartRepository;
-
-    @Autowired
     private final CartItemRepository cartItemRepository;
-
+    public ShoppingCartServiceImpl(ProductService productService, IngredientService ingredientService, ShoppingCartRepository shoppingCartRepository, CartItemRepository cartItemRepository) {
+        this.productService = productService;
+        this.ingredientService = ingredientService;
+        this.shoppingCartRepository = shoppingCartRepository;
+        this.cartItemRepository = cartItemRepository;
+    }
 
     public boolean addProduct(Long productId, int productQty) throws OutOfStockException, ProductNotFoundException {
 
@@ -40,16 +37,12 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
         Map<Long, Double> recipeIngr = product.getRecipe().toRecipeIngrId();
 
-        recipeIngr.forEach((key, value) -> ingredientService.confirmStockAvailability(key, value, productQty)); // since we're just adding to a cart, we must first check if we have enough stock
+        recipeIngr.forEach((id, ingrQty) -> ingredientService.confirmStockAvailability(id, ingrQty, productQty)); // since we're just adding to a cart, we must first check if we have enough stock
 
         // if we reach here, means that we have enough stock
 
-        if (cart.containsKey(productId)) {
-            return cart.replace(productId, cart.get(productId), cart.get(productId) + productQty);
-        } else {
-            cart.put(productId, productQty);
-            return cart.containsKey(productId);
-        }
+        cart.compute(productId, (key, value) -> value == null ? productQty : value + productQty);
+        return cart.containsKey(productId);
 
     }
 
@@ -62,17 +55,16 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         }
         Product product = productService.findById(productId);
 
-        Map<Long, Double> recipeIngr = product.getRecipe().toRecipeIngrId();
-
         // since we're removing a product from a cart, then we must return ingredients to the db copy we just had.
-        recipeIngr.forEach((key,value)-> ingredientService.returnIngrToStockDb(key, value, productQty));
+        product.getRecipe().toRecipeIngrId().forEach((key, value) -> ingredientService.returnIngrToStockDb(key, value, productQty));
 
-        int productCurrentQtyInCart = cart.get(productId); // query products quantity in the cart,
+        int currentProductQty = cart.get(productId) - productQty; // subtract
 
-        if (productCurrentQtyInCart > 0) {
-            return cart.replace(productId, cart.get(productId), productCurrentQtyInCart);
+        if (currentProductQty > 0) {
+            cart.put(productId, currentProductQty); // remove product
+            return true;
         } else {
-            return Objects.equals(cart.get(productId), cart.remove(productId));
+            return cart.remove(productId)!=null;
         }
 
     }
@@ -86,7 +78,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
             }
         }
 
-        List<CartItem> distinctShoppingCart = cart.entrySet().stream().map(e-> new CartItem(e.getKey(), e.getValue())).toList();
+        List<CartItem> distinctShoppingCart = cart.entrySet().stream().map(e -> new CartItem(e.getKey(), e.getValue())).toList();
 
         shoppingCart.setCartItems(distinctShoppingCart); // update the shopping cart
         shoppingCart = shoppingCartRepository.save(shoppingCart); // add to db to get its id
@@ -102,7 +94,6 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
     @Override
     public List<ShoppingCart> findAll() {
-        List<ShoppingCart> shoppingCart = new ArrayList<>();
         return shoppingCartRepository.findAll();
     }
 

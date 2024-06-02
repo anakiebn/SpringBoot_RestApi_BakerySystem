@@ -16,12 +16,13 @@ import java.util.List;
 @RestController
 @RequestMapping("api/v1/orders")
 @Slf4j
-@RequiredArgsConstructor
 public class OrderController {
 
-
-    @Autowired
     private final OrderService orderService;
+
+    public OrderController(OrderService orderService) {
+        this.orderService = orderService;
+    }
 
     @GetMapping("/find/{id}")
     public ResponseEntity<Order> findById(@PathVariable Long id) throws OrderNotFoundException {

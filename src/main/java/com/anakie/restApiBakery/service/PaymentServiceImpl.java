@@ -17,18 +17,25 @@ import java.util.Random;
 
 @Service
 @Slf4j
-@RequiredArgsConstructor
 public class PaymentServiceImpl implements PaymentService {
-    @Autowired
+
     private final PaymentRepository paymentRepository;
-    @Autowired
+
     private final OrderService orderService;
-    @Autowired
+
     private final AccountService accountService;
-    @Autowired
+
     private final PaymentStatusHistoryRepository paymentStatusHistoryRepository;
-    @Autowired
+
     private final EmailService emailService;
+
+    public PaymentServiceImpl(PaymentRepository paymentRepository, OrderService orderService, AccountService accountService, PaymentStatusHistoryRepository paymentStatusHistoryRepository, EmailService emailService) {
+        this.paymentRepository = paymentRepository;
+        this.orderService = orderService;
+        this.accountService = accountService;
+        this.paymentStatusHistoryRepository = paymentStatusHistoryRepository;
+        this.emailService = emailService;
+    }
 
     @Override
     public Payment save(PaymentDTO paymentDTO) throws OrderNotFoundException, ProductNotFoundException, InsufficientFundsException, UserNotFoundException, AccountNotFoundException, MessagingException {

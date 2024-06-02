@@ -19,12 +19,15 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("api/v1/recipes")
-@RequiredArgsConstructor
 public class RecipeController {
 
 
-    @Autowired
+
     private final RecipeService recipeService;
+
+    public RecipeController(RecipeService recipeService) {
+        this.recipeService = recipeService;
+    }
 
     @GetMapping("/find/{id}")
     public ResponseEntity<Recipe> findById(@PathVariable Long id) throws RecipeNotFoundException {
